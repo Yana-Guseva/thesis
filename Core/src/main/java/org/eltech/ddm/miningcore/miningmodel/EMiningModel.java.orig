@@ -1,0 +1,399 @@
+package org.eltech.ddm.miningcore.miningmodel;
+
+import org.eltech.ddm.miningcore.MiningException;
+import org.eltech.ddm.miningcore.algorithms.MiningAlgorithm;
+import org.eltech.ddm.miningcore.algorithms.Step;
+import org.eltech.ddm.miningcore.miningfunctionsettings.MiningFunction;
+import org.eltech.ddm.miningcore.miningfunctionsettings.EMiningFunctionSettings;
+import org.omg.java.cwm.analysis.datamining.miningcore.miningmodel.MiningModel;
+import org.omg.java.cwm.objectmodel.core.Attribute;
+//import org.omg.java.cwm.objectmodel.core.Class;
+
+
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
+
+/**
+ * CWM Class
+ *
+ * A MiningModel holds the metadata of the result of a mining (training) task. This
+ * information is sufficient to determine whether a model can be applied to a given data.
+ *
+ * @author Ivan Holod
+ *
+ */
+public abstract class EMiningModel extends MiningModel implements Cloneable  // Model
+{
+	static public final String NAME_CURRENT_VECTOR = "CurrentVector"; 
+	static public final String NAME_CURRENT_ATTRIBUTE = "CurrentAttribute";
+	static public final String NAME_CURRENT_ATTRIBUTE_VALUE = "CurrentAttributeValue";
+
+	protected List<Class> doneSteps;
+	
+	protected HashMap<String, Object> stateParameters;
+
+	// Added features for JDMAPI
+	/**
+	 * Name of the application that generated this model
+	 */
+	private String  applicationName;
+
+	/**
+	 * Time in seconds that was taken to build the model
+	 */
+	private Integer buildDuration = null;
+
+	/**
+	 * Major version of JDM by which the model was built.
+	 */
+	private String majorVersion;
+
+	/**
+	 * Minor version of JDM by which the model was built.
+	 */
+	private String minorVersion;
+
+	/**
+	 * Identifier of the task used to build or import the model
+	 */
+	private String taskID;
+
+	/**
+	 * The name of the JDM provider, i.e., the vendor, that built the model.
+	 */
+	private String providerName;
+
+	private String providerVersion;
+
+	/**
+	 * Number of vectors (cases) in input data
+	 */
+	private int vectorCount;
+
+	
+	// ======= current state of model (build model task) ==================
+	/**
+	 * Vector from input data is being read
+	 */
+	//private ThreadLocal<Integer> currentVector;
+	//private int currentVector;
+
+	/**
+	 * Attribute from input data is being read
+	 */
+//	private ThreadLocal<Integer> currentAttribute;
+//	private int currentAttribute;
+	
+	
+	/**
+	 * Index of current categorical attribute value 
+	 */
+	//private int currentAttributeValue;
+
+	public EMiningModel(EMiningFunctionSettings settings) throws MiningException{
+		this.settings = settings;
+		doneSteps = new ArrayList<Class>();
+		stateParameters = new HashMap<String, Object>();
+//		currentVector = new ThreadLocal<Integer>();
+//		currentAttribute = new ThreadLocal<Integer>();
+		createModel();
+	}
+	
+	public abstract void createModel() throws MiningException;
+	
+//	public abstract void join(ArrayList<EMiningModel> joinModels) throws MiningException;
+//
+//	public ArrayList<EMiningModel> split(int handlerCount) throws MiningException
+//	{
+//		ArrayList<EMiningModel> models = new ArrayList<EMiningModel>(handlerCount);
+//		
+//		for(int i=0; i < handlerCount; i++){
+//			models.add((EMiningModel)this.clone());
+//		}
+//		
+//		return models;
+//	}
+
+	/**
+	 * Returns the name of the application that generated this model. Refer to BuildTask.
+	 * @return
+	 */
+	public String getApplicationName() {
+		return applicationName;
+	}
+
+	/**
+	 * @param applicationName the applicationName to set
+	 */
+	public void setApplicationName(String applicationName) {
+		this.applicationName = applicationName;
+	}
+
+	/**
+	 * Returns the time in seconds that was taken to build the model.
+	 * Returns null if this feature is not supported. .
+	 * @return
+	 */
+	public Integer getBuildDuration() {
+		return buildDuration;
+	}
+
+	/**
+	 * @param buildDuration the buildDuration to set
+	 */
+	public void setBuildDuration(Integer buildDuration) {
+		this.buildDuration = buildDuration;
+	}
+
+	/**
+	 * Returns the build settings used to build the model, as specified by the user.
+	 * If the model was imported, it is possible that the settings may be null.
+	 * Note! This method uses instead JDMAPI method getBuildSettings
+	 * @return
+	 */
+	public EMiningFunctionSettings getMiningSettings() {
+		return (EMiningFunctionSettings)settings;
+	}
+
+	/**
+	 * @param settings the settings to set
+	 */
+	public void setMiningSettings(EMiningFunctionSettings settings) {
+		this.settings = settings;
+	}
+
+	/**
+	 * Returns the build settings that was actually used by the DME (with systemDefault
+	 * and systemDetermined replaced with actual values). The inclusion of LogicalData is vendor
+	 * specific.If the model signature contains a subset of active attributes, the effective
+	 * settings needs to contain the original logical data so that the information is not lost.
+	 * If model was imported, it is possible that the settings may be null.
+	 * @return
+	 */
+	public EMiningFunctionSettings getEffectiveBuildSettings() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/**
+	 * Returns the major version of JDM by which the model was built.
+	 * @return
+	 */
+	public String getMajorVersion() {
+		return majorVersion;
+	}
+
+	/**
+	 * Returns the type of the mining algorithm used to build the model.
+	 * @return
+	 */
+	public MiningAlgorithm getMiningAlgorithm() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+	/**
+	 * Returns the minor version of JDM by which the model was built.
+	 * @return
+	 */
+	public String getMinorVersion() {
+		// TODO Auto-generated method stub
+		return minorVersion;
+	}
+
+	/**
+	 * Returns the name of the JDM provider, i.e., the vendor, that built the model.
+	 * @return
+	 */
+	public String getProviderName() {
+		return providerName;
+	}
+
+	/**
+	 * Returns the version number of the JDM system provided by a vendor that was
+	 * used to build the model.
+	 * @return
+	 */
+	public String getProviderVersion() {
+		return providerVersion;
+	}
+
+	/**
+	 * Returns the model signature (if any), i.e., the set of
+	 * required inputs for applying the model, or as was used for building the model.
+	 * @return
+	 */
+	public EModelSignature getSignature() {
+		return (EModelSignature)modelSignature;
+	}
+
+	/**
+	 * @param modelSignature the modelSignature to set
+	 */
+	public void setSignature(EModelSignature modelSignature) {
+		this.modelSignature = modelSignature;
+	}
+
+	/**
+	 * Returns the identifier of the task used to build or import the model.
+	 * If the model was imported, this may be null.
+	 * @return
+	 */
+	public String getTaskIdentifier() {
+		return taskID;
+	}
+
+	/**
+	 * Returns a string that can be used to uniquely reference the JDM model.
+	 * Application and vendor requirements determine how unique this identifier must be.
+	 * This is distinct from the identifier returned from MiningObject.getObjectIdentifier.
+	 * @return
+	 */
+	public String getUniqueIdentifier() {
+		// TODO Auto-generated method stub
+		return keyValue.toString();
+	}
+
+	/**
+	 * Returns the JDM version by which the model was built.
+	 * @return
+	 */
+	public String getVersion() {
+		return majorVersion + "." + minorVersion;
+	}
+
+	/**
+	 * @param algorithmName the algorithmName to set
+	 */
+	public void setAlgorithmName(String algorithmName) {
+		this.algorithmName.setString(algorithmName);
+	}
+
+	/**
+	 * @return the algorithmName
+	 */
+	public String getAlgorithmName() {
+		return algorithmName.getString();
+	}
+
+//	public int getCurentVector() {
+//		return currentVector;
+//	}
+//
+//	public void setCurentVector(int index) {
+//		currentVector = index;//.set(index);
+//	}
+
+	public Object clone() {
+		EMiningModel o = null;
+		o = (EMiningModel)super.clone();
+
+	    if(settings != null)
+	    	o.settings = (EMiningFunctionSettings)settings.clone();
+
+	    if(modelSignature != null)
+	    	o.modelSignature = (EModelSignature)modelSignature.clone();
+
+//	    if(modelLocation != null)
+//	    	o.modelLocation = (Class)modelLocation.clone();
+
+	    if(keyAttribute != null)
+	    	o.keyAttribute = (Attribute)keyAttribute.clone();
+
+	    if(doneSteps != null){
+	    	o.doneSteps =  new ArrayList<Class>(); 
+	    	for(Class step : doneSteps)
+	    		o.doneSteps.add(step);
+	    }
+
+	    if(stateParameters != null){
+	    	o.stateParameters = new HashMap<String, Object>(); 
+	    	for(String name : stateParameters.keySet())
+	    		o.stateParameters.put(name, stateParameters.get(name));
+	    }
+	    
+//	    o.currentVector = currentVector; //new ThreadLocal<Integer>();
+//	    o.currentAttribute = currentAttribute; //new ThreadLocal<Integer>();
+
+		return o;
+	}
+
+//	public int getCurrentAttribute() {
+//		return currentAttribute; //.get();
+//	}
+//
+//	public void setCurrentAttribute(int currentAttribute) {
+//		this.currentAttribute = currentAttribute; //.set(currentAttribute);
+//	}
+
+	public int getVectorCount() {
+		return vectorCount;
+	}
+
+	public void setVectorCount(int numberOfVectors) {
+		this.vectorCount = numberOfVectors;
+	}
+	
+	public void addStep(Class step){
+		if(doneSteps != null){
+			if(!doneSteps.contains(step))
+				doneSteps.add(step);
+		}
+	}
+	
+	public Class getLastStep(){
+		if(doneSteps != null && doneSteps.size() > 0)
+			return doneSteps.get(doneSteps.size() - 1);
+		
+		return null;
+	}
+
+	public Class getStep(int index){
+		if(doneSteps != null)
+			return doneSteps.get(index);
+		
+		return null;
+	}
+
+	public boolean containsStep(Class step){
+		if(doneSteps != null)
+			return doneSteps.contains(step);
+		
+		return false;
+	}
+
+	public synchronized void putStateParameter (String name, Object value){
+		if(stateParameters != null)
+			stateParameters.put(name, value);
+	}
+
+	public synchronized Object getStateParameter (String name){
+		if(stateParameters != null)
+			return stateParameters.get(name);
+		
+		return null;
+	}
+	
+	public synchronized HashMap<String, Object> getStateParameters(){
+
+		return stateParameters;
+	}
+
+	public synchronized void removeStateParameter(String name) {
+		if(stateParameters != null)
+			stateParameters.remove(name);
+	}
+
+//	public int getCurrentAttributeValue() {
+//		return currentAttributeValue;
+//	}
+//
+//	public void setCurrentAttributeValue(int currentAttributeValue) {
+//		this.currentAttributeValue = currentAttributeValue;
+//	}
+
+}

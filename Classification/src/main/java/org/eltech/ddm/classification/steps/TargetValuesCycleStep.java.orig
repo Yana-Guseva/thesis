@@ -1,0 +1,63 @@
+package org.eltech.ddm.classification.steps;
+
+import org.eltech.ddm.classification.ClassificationFunctionSettings;
+import org.eltech.ddm.classification.ClassificationMiningModel;
+import org.eltech.ddm.inputdata.MiningInputStream;
+import org.eltech.ddm.miningcore.MiningException;
+import org.eltech.ddm.miningcore.algorithms.CycleStep;
+import org.eltech.ddm.miningcore.algorithms.Step;
+import org.eltech.ddm.miningcore.miningdata.ELogicalAttribute;
+import org.eltech.ddm.miningcore.miningfunctionsettings.EMiningFunctionSettings;
+import org.eltech.ddm.miningcore.miningmodel.EMiningModel;
+import org.omg.java.cwm.analysis.datamining.miningcore.miningfunctionsettings.MiningFunctionSettings;
+import org.omg.java.cwm.analysis.datamining.miningcore.miningmodel.MiningModel;
+
+public class TargetValuesCycleStep extends CycleStep {
+	private final ELogicalAttribute target;
+
+	public TargetValuesCycleStep(EMiningFunctionSettings settings)
+			throws MiningException {
+		super(settings);
+		target = ((ClassificationFunctionSettings) settings).getTarget();
+	}
+
+	public TargetValuesCycleStep(EMiningFunctionSettings settings, Step ...steps)
+																throws MiningException {
+		super(settings, steps);
+		target = ((ClassificationFunctionSettings) settings).getTarget();
+	}
+
+	@Override
+	protected EMiningModel initLoop(MiningInputStream inputData, EMiningModel model) throws MiningException {
+		setStateParameter(model, ClassificationMiningModel.NAME_CURRENT_TARGET_VALUE, 0);
+		//((ClassificationMiningModel) model).setCurrentTargetValue(0);
+		
+		return model;
+	}
+
+
+	@Override
+	protected boolean conditionLoop(MiningInputStream inputData, EMiningModel model) throws MiningException {
+//		return ((ClassificationMiningModel) model).getCurrentTargetValue() < target.getCategoricalProperties().getSize();
+		
+		return (Integer)getStateParameter(model, ClassificationMiningModel.NAME_CURRENT_TARGET_VALUE) < target.getCategoricalProperties().getSize();
+	}
+
+	@Override
+	protected EMiningModel beforeIteration(MiningInputStream inputData, EMiningModel model) throws MiningException {
+
+		return model;
+	}
+
+	@Override
+	protected EMiningModel afterIteration(MiningInputStream inputData, EMiningModel model) throws MiningException {
+		setStateParameter(model, ClassificationMiningModel.NAME_CURRENT_TARGET_VALUE,
+				(Integer)getStateParameter(model, ClassificationMiningModel.NAME_CURRENT_TARGET_VALUE) +1);
+//		((ClassificationMiningModel) model).setCurrentTargetValue(((ClassificationMiningModel) model).getCurrentTargetValue() + 1);
+		
+		return model;
+	}
+
+
+
+}

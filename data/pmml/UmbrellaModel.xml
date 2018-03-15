@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PMML>
+  <Header copyright="Copyright(c) 2002-2008 prudsys AG. All Rights Reserved." description="XELOPES mining model. See www.prudsys.com">
+    <Application attribute="XELOPES" version="3.1.0"/>
+    <Timestamp>2008-03-01 10:24:10 CET</Timestamp>
+  </Header>
+  <DataDictionary numberOfFields="4">
+    <DataField attribute="Forecast" displayName="Forecast" isCyclic="0" optype="categorical" dataType="string">
+      <Value value="Sunny" displayValue="Sunny" property="valid"/>
+      <Value value="Claudy" displayValue="Claudy" property="valid"/>
+      <Value value="Rainy" displayValue="Rainy" property="valid"/>
+    </DataField>
+    <DataField attribute="Weather" displayName="Weather" isCyclic="0" optype="categorical" dataType="string">
+      <Value value="No_Rain" displayValue="No_Rain" property="valid"/>
+      <Value value="Rain" displayValue="Rain" property="valid"/>
+    </DataField>
+    <DataField attribute="Decide_Umbrella" displayName="Decide_Umbrella" isCyclic="0" optype="categorical" dataType="string">
+      <Value value="Take_It" displayValue="Take_It" property="valid"/>
+      <Value value="Leave_At_Home" displayValue="Leave_At_Home" property="valid"/>
+    </DataField>
+    <DataField attribute="Satisfaction" displayName="Satisfaction" optype="continuous" dataType="double" isCyclic="0">
+      <Interval closure="openOpen" leftMargin="-INF" rightMargin="INF"/>
+    </DataField>
+  </DataDictionary>
+  <BayesNetwork modelName="bayes network model" functionName="regression" algorithmName="bayesianNetwork">
+    <MiningSchema>
+      <MiningField attribute="Forecast" usageType="active" outliers="asIs" missingValueTreatment="asIs"/>
+      <MiningField attribute="Weather" usageType="active" outliers="asIs" missingValueTreatment="asIs"/>
+      <MiningField attribute="Decide_Umbrella" usageType="active" outliers="asIs" missingValueTreatment="asIs"/>
+      <MiningField attribute="Satisfaction" usageType="active" outliers="asIs" missingValueTreatment="asIs"/>
+    </MiningSchema>
+    <BayesNet attribute="Umbrella">
+      <BayesNode id="Forecast" kind="nature" type="categorical" chance="chance">
+        <BayesParents>
+          <BayesParent id="Weather"/>
+        </BayesParents>
+        <BayesProbs>
+          <BayesProb indexes="0">0.7 0.2 0.1 0.0</BayesProb>
+          <BayesProb indexes="1">0.15 0.25 0.6 0.0</BayesProb>
+        </BayesProbs>
+      </BayesNode>
+      <BayesNode id="Weather" kind="nature" type="categorical" chance="chance">
+        <BayesParents/>
+        <BayesProbs>
+          <BayesProb>0.7 0.3 0.0</BayesProb>
+        </BayesProbs>
+      </BayesNode>
+      <BayesNode id="Decide_Umbrella" kind="decision" type="categorical" chance="chance">
+        <BayesParents>
+          <BayesParent id="Forecast"/>
+        </BayesParents>
+        <BayesProbs>
+          <BayesProb indexes="0"/>
+          <BayesProb indexes="1"/>
+          <BayesProb indexes="2"/>
+        </BayesProbs>
+      </BayesNode>
+      <BayesNode id="Satisfaction" kind="utility" type="continuous" chance="deterministic">
+        <BayesParents>
+          <BayesParent id="Weather"/>
+          <BayesParent id="Decide_Umbrella"/>
+        </BayesParents>
+        <BayesProbs>
+          <BayesProb indexes="0 0">20.0 0.0</BayesProb>
+          <BayesProb indexes="0 1">100.0 0.0</BayesProb>
+          <BayesProb indexes="1 0">70.0 0.0</BayesProb>
+          <BayesProb indexes="1 1">0.0 0.0</BayesProb>
+        </BayesProbs>
+      </BayesNode>
+    </BayesNet>
+  </BayesNetwork>
+</PMML>

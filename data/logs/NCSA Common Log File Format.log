@@ -1,0 +1,5 @@
+172.16.15.1 - - [15/Nov/1999:10:38:16 +0000] "GET /isroot/CSS/EN.CSS HTTP/1.0" 304 29
+172.16.15.1 5 - [15/Nov/1999:10:38:17 +0000] "GET /isroot/Images/back1.gif HTTP/1.0" 304 29
+172.16.15.1 - - [15/Nov/1999:10:38:17 +0000] "GET /isroot/Images/metaphor_welcome_top.gif HTTP/1.0" 304 29
+172.16.15.1 5 - [15/Nov/1999:10:38:17 +0000] "GET /isroot/xxxImages/tag_welcome2IS4_en.gif HTTP/1.0" 304 29
+172.16.15.1 - - [15/Nov/1999:10:38:17 +0000] "GET /4_en.gif HTTP/1.0" 304 29

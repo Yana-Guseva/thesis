@@ -1,0 +1,24 @@
+dependencies {
+    compile project(':Core')
+    compile project(':Association')
+    compile project(':CWM')
+    
+    compile 'commons-io:commons-io:2.4'
+//    compile 'com.google.guava:guava:18.0'
+    compile 'gov.nist.math:jama:1.0.3'
+//    compile 'org.javassist:javassist:3.18.0-GA'
+//    compile 'javax.xml.bind:jaxb-api:2.2.6'
+
+//    compile files('libs/jdm11.jar')
+
+//    compile 'org.json:org.json:chargebee-1.0'
+//    compile 'net.sourceforge.jexcelapi:jxl:2.6.12'
+    compile files('libs/reflections-0.9.9-RC1-uberjar.jar')
+
+    compile fileTree(dir: "libs/CloverETL", include: "**/*.jar")
+    compile fileTree(dir: "libs/Kettle", include: "**/*.jar")
+    compile fileTree(dir: "libs/poi-bin-3.10.1-20140818", include: "**/*.jar")
+
+    compile 'org.slf4j:slf4j-simple:1.6.4'
+
+}

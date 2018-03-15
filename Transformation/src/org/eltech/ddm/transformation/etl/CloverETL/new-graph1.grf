@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Graph author="User" created="Sat May 17 22:35:10 MSK 2014" guiVersion="4.0.0.M1" id="1400351988083" licenseType="Community" modified="Thu Nov 20 00:50:07 MSK 2014" modifiedBy="User" attribute="new-graph" revision="1.21" showComponentDetails="true">
+<Global>
+<Metadata id="Metadata0">
+<Record fieldDelimiter="|" attribute="recordName1" recordDelimiter="\r\n" type="delimited">
+<Field attribute="Info" type="string"/>
+</Record>
+</Metadata>
+<Metadata id="Metadata7" previewAttachmentCharset="ISO-8859-1">
+<Record fieldDelimiter="|" attribute="recordName2" previewAttachmentCharset="ISO-8859-1" recordDelimiter="\r\n" type="delimited">
+<Field attribute="field1" type="string"/>
+<Field delimiter="|" attribute="field2" type="string"/>
+</Record>
+</Metadata>
+<Metadata id="Metadata1">
+<Record fieldDelimiter="|" attribute="Test_List1" recordDelimiter="\r\n" type="delimited">
+<Field label="Info" attribute="Info" type="long"/>
+</Record>
+</Metadata>
+<Metadata id="Metadata2">
+<Record fieldDelimiter="|" attribute="Test_List1" recordDelimiter="\r\n" type="delimited">
+<Field label="id" attribute="id" type="long"/>
+<Field label="data" attribute="data" type="string"/>
+</Record>
+</Metadata>
+<Metadata id="Metadata3">
+<Record fieldDelimiter="|" attribute="Test_List1" recordDelimiter="\r\n" type="delimited">
+<Field label="id" attribute="id" type="integer"/>
+<Field label="data" attribute="data" type="string"/>
+</Record>
+</Metadata>
+<Metadata id="Metadata4">
+<Record fieldDelimiter="|" attribute="Test_List1" recordDelimiter="\r\n" type="delimited">
+<Field label="id" attribute="id" type="integer"/>
+<Field label="data" attribute="data" type="string"/>
+</Record>
+</Metadata>
+<Metadata id="Metadata5">
+<Record fieldDelimiter="|" attribute="Test_List1" recordDelimiter="\r\n" type="delimited">
+<Field label="id" attribute="id" type="string"/>
+<Field label="data" attribute="data" type="string"/>
+</Record>
+</Metadata>
+<Metadata id="Metadata6">
+<Record fieldDelimiter="|" attribute="Test_List1" recordDelimiter="\r\n" type="delimited">
+<Field label="id" attribute="id" type="string"/>
+<Field label="data" attribute="data" type="string"/>
+</Record>
+</Metadata>
+<GraphParameters>
+<GraphParameterFile fileURL="workspace.prm"/>
+</GraphParameters>
+<Dictionary/>
+</Global>
+<Phase number="0">
+<Node enabled="enabled" fileURL="http://www.hscic.gov.uk/catalogue/PUB13648/Obes-phys-acti-diet-eng-2014-tab.xls" guiName="XLSDataReader" guiX="213" guiY="109" id="XLSDATA_READER" metadataRow="0" type="XLS_READER"/>
+<Node enabled="enabled" fileURL="C:\Pract\data\testing.xlsx" guiName="XLSDataWriter" guiX="507" guiY="128" id="XLSDATA_WRITER" type="XLS_WRITER"/>
+<Edge fromNode="XLSDATA_READER:0" guiBendpoints="" guiRouter="Manhattan" id="Edge1" inPort="Port 0 (in)" metadata="Metadata7" outPort="Port 0 (out)" toNode="XLSDATA_WRITER:0"/>
+</Phase>
+</Graph>

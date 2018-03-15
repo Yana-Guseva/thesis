@@ -1,0 +1,10 @@
+@relation reverse_10
+@attribute A {1, 0, true, false}
+@attribute B {1, 0, true, false}
+@attribute C {1, 0, true, false}
+@attribute D {1, 0, true, false}
+@attribute E {1, 0, true, false}
+
+@data
+1,1,1,0,0
+0,0,1,0,0

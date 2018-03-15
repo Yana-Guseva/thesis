@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE PMML PUBLIC "pmml20.dtd" "pmml20.dtd">
+<PMML version="2.0" >
+	<Header copyright="Copyright (c) 2001-2004 prudsys AG" description="See www.prudsys.com for more information">
+		<Application version="5.0" attribute="prudsys DISCOVERER" />
+		<Timestamp>Tue Nov 28 12:19:56 2006
+</Timestamp>
+	</Header>
+	<DataDictionary numberOfFields="4">
+		<DataField displayName="Alter" attribute="Alter" optype="categorical">
+			<Value displayValue="17" property="valid" value="17"/>
+			<Value displayValue="18" property="valid" value="18"/>
+			<Value displayValue="20" property="valid" value="20"/>
+			<Value displayValue="65" property="valid" value="65"/>
+		</DataField>
+		<DataField displayName="Farbe" attribute="Farbe" taxonomy="Farbe" optype="categorical">
+			<Value displayValue="Farbe1" property="valid" value="Farbe1"/>
+			<Value displayValue="Farbe2" property="valid" value="Farbe2"/>
+			<Value displayValue="gruen" property="valid" value="gruen"/>
+			<Value displayValue="blau" property="valid" value="blau"/>
+			<Value displayValue="gelb" property="valid" value="gelb"/>
+			<Taxonomy attribute="Farbe">
+				<ChildParent childField="member" isRecursive="yes" parentField="pargroup">
+					<InlineTable>
+						<row>
+							<member attribute="gruen"/>
+							<pargroup attribute="Farbe1"/>
+						</row>
+						<row>
+							<member attribute="blau"/>
+							<pargroup attribute="Farbe1"/>
+						</row>
+						<row>
+							<member attribute="gelb"/>
+							<pargroup attribute="Farbe2"/>
+						</row>
+					</InlineTable>
+				</ChildParent>
+			</Taxonomy>
+		</DataField>
+		<DataField displayName="Geschlecht" attribute="Geschlecht" optype="categorical">
+			<Value displayValue="m" property="valid" value="m"/>
+			<Value displayValue="w" property="valid" value="w"/>
+		</DataField>
+		<DataField displayName="Reagierer" attribute="Reagierer" taxonomy="Reagierer" optype="categorical">
+			<Value displayValue="1" property="valid" value="1"/>
+			<Value displayValue="0" property="valid" value="0"/>
+			<Value displayValue="reagiert" property="valid" value="reagiert"/>
+			<Value displayValue="nicht" property="valid" value="nicht"/>
+			<Taxonomy attribute="Reagierer">
+				<ChildParent childField="member" isRecursive="yes" parentField="pargroup">
+					<InlineTable>
+						<row>
+							<member attribute="0"/>
+							<pargroup attribute="nicht"/>
+						</row>
+						<row>
+							<member attribute="1"/>
+							<pargroup attribute="reagiert"/>
+						</row>
+					</InlineTable>
+				</ChildParent>
+			</Taxonomy>
+		</DataField>
+	</DataDictionary>
+	<TransformationDictionary>
+		<DerivedField attribute="T_Alter" displayName="Transformed Alter" removeSourceAtt="0">
+			<MapValuesNum outputColumn="pargroup">
+				<FieldColumnPair field="Alter" column="member"/>
+				<InlineTable>
+					<row>
+						<member attribute="17"/>
+						<pargroup attribute="0"/>
+					</row>
+					<row>
+						<member attribute="18"/>
+						<pargroup attribute="1"/>
+					</row>
+					<row>
+						<member attribute="20"/>
+						<pargroup attribute="2"/>
+					</row>
+					<row>
+						<member attribute="65"/>
+						<pargroup attribute="3"/>
+					</row>
+				</InlineTable>
+			</MapValuesNum>
+		</DerivedField>
+
+		<DerivedField attribute="T_Farbe" displayName="Transformed Farbe" removeSourceAtt="0">
+			<MapValuesNum outputColumn="pargroup">
+				<FieldColumnPair field="Farbe" column="member"/>
+				<InlineTable>
+					<row>
+						<member attribute="Farbe1"/>
+						<pargroup attribute="0.666666666666667"/>
+					</row>
+					<row>
+						<member attribute="Farbe2"/>
+						<pargroup attribute="0"/>
+					</row>
+				</InlineTable>
+			</MapValuesNum>
+		</DerivedField>
+
+		<DerivedField attribute="T_Geschlecht" displayName="Transformed Geschlecht" removeSourceAtt="0">
+			<MapValuesNum outputColumn="pargroup">
+				<FieldColumnPair field="Geschlecht" column="member"/>
+				<InlineTable>
+					<row>
+						<member attribute="m"/>
+						<pargroup attribute="0"/>
+					</row>
+					<row>
+						<member attribute="w"/>
+						<pargroup attribute="1"/>
+					</row>
+				</InlineTable>
+			</MapValuesNum>
+		</DerivedField>
+
+		<DerivedField attribute="virtual" displayName="Virtual Reagierer" removeSourceAtt="0">
+			<CreateVirtualAttribute field="Reagierer"/>
+		</DerivedField>
+
+		<DerivedField attribute="TZ_T_Alter" displayName="Transformed T_Alter" removeSourceAtt="1">
+			<NormContinuous field="T_Alter">
+				<LinearNorm orig="1.5" norm="0"/>
+				<LinearNorm orig="8.780109889280517" norm="1"/>
+			</NormContinuous>
+		</DerivedField>
+
+		<DerivedField attribute="TZ_T_Farbe" displayName="Transformed T_Farbe" removeSourceAtt="1">
+			<NormContinuous field="T_Farbe">
+				<LinearNorm orig="0.5" norm="0"/>
+				<LinearNorm orig="2.73606797749979" norm="1"/>
+			</NormContinuous>
+		</DerivedField>
+
+		<DerivedField attribute="TZ_T_Geschlecht" displayName="Transformed T_Geschlecht" removeSourceAtt="1">
+			<NormContinuous field="T_Geschlecht">
+				<LinearNorm orig="0.5" norm="0"/>
+				<LinearNorm orig="3.268874620972692" norm="1"/>
+			</NormContinuous>
+		</DerivedField>
+
+	</TransformationDictionary>
+
+	<VectorDictionary numberOfVectors="1">
+		<VectorInstance id="0">
+			<AttributeInstance attribute="TZ_T_Alter" value="0.5494422557947561"/>
+			<AttributeInstance attribute="TZ_T_Farbe" value="-0.2981423969999719"/>
+			<AttributeInstance attribute="TZ_T_Geschlecht" value="0"/>
+			<AttributeInstance attribute="virtual" value="0"/>
+			<AttributeInstance attribute="Alter" value="0"/>
+			<AttributeInstance attribute="Farbe" value="0"/>
+			<AttributeInstance attribute="Geschlecht" value="0"/>
+			<AttributeInstance attribute="Reagierer" value="0"/>
+		</VectorInstance>
+	</VectorDictionary>
+	<TreeModel modelName="Decision Tree Model" functionName="classification">
+		<MiningSchema>
+			<MiningField attribute="TZ_T_Alter" usageType="active"/>
+			<MiningField attribute="TZ_T_Farbe" usageType="active"/>
+			<MiningField attribute="TZ_T_Geschlecht" usageType="active"/>
+			<MiningField attribute="virtual" usageType="active"/>
+			<MiningField attribute="Alter" usageType="active" missingValueTreatment="asValue" missingValueReplacement="65"/>
+			<MiningField attribute="Farbe" usageType="active" missingValueTreatment="asValue" missingValueReplacement="Farbe2"/>
+			<MiningField attribute="Geschlecht" usageType="active" missingValueTreatment="asMean" missingValueReplacement="0"/>
+			<MiningField attribute="Reagierer" usageType="predicted"/>
+		</MiningSchema><Node score="nicht" recordCount="4">
+<True/>	<SupportVectorMachineModel modelName="Support vector machine model" functionName="classification" algorithmName="supportVectorMachine" svm_type="EPSILON_SVR">
+		<MiningSchema>
+			<MiningField attribute="TZ_T_Alter" usageType="active"/>
+			<MiningField attribute="TZ_T_Farbe" usageType="active"/>
+			<MiningField attribute="TZ_T_Geschlecht" usageType="active"/>
+			<MiningField attribute="Reagierer" usageType="predicted"/>
+		</MiningSchema>
+		<LinearKernelType description="Linear kernel function"/>		<SupportVectors numberOfSupportVectors="1" numberOfAttributes="8">
+			<SupportVector vectorId="0"/>
+		</SupportVectors>
+		<Coefficients numberOfSupportVectors="1" absoluteValue="0">
+			<Coefficient value="1"/>
+		</Coefficients>
+	</SupportVectorMachineModel>
+
+	<ScoreDistribution value="reagiert" recordCount="2"/>
+	<ScoreDistribution value="nicht" recordCount="2"/>
+<Node score="reagiert" recordCount="2">
+<SimplePredicate field="virtual" value="-0.0222222222" operator="lessThan"/>
+	<ScoreDistribution value="reagiert" recordCount="2"/>
+	<ScoreDistribution value="nicht" recordCount="0"/>
+</Node>
+<Node score="nicht" recordCount="2">
+<SimplePredicate field="virtual" value="-0.0222222222" operator="greaterOrEqual"/>
+	<ScoreDistribution value="reagiert" recordCount="0"/>
+	<ScoreDistribution value="nicht" recordCount="2"/>
+</Node>
+</Node>
+	</TreeModel>
+</PMML>

@@ -1,0 +1,15 @@
+@relation weather-information
+@attribute observation	{sun, cloudiness, rain}
+@attribute temperature	{hot, normal, cold}
+@attribute wet	{high, normal}
+@attribute wind {no, yes}
+@attribute game {no, yes}
+
+@data
+rain,hot,normal,yes,no
+rain,cold,high,no,no
+cloudiness,normal,high,no,yes
+rain,normal,high,no,yes
+cloudiness,cold,high,no,no
+rain,cold,normal,yes,no
+cloudiness,cold,normal,yes,yes

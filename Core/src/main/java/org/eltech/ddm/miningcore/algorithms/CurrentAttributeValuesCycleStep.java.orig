@@ -1,0 +1,49 @@
+package org.eltech.ddm.miningcore.algorithms;
+
+import org.eltech.ddm.inputdata.MiningInputStream;
+import org.eltech.ddm.miningcore.MiningException;
+import org.eltech.ddm.miningcore.miningdata.ELogicalAttribute;
+import org.eltech.ddm.miningcore.miningfunctionsettings.EMiningFunctionSettings;
+import org.eltech.ddm.miningcore.miningmodel.EMiningModel;
+
+public class CurrentAttributeValuesCycleStep extends CycleStep {
+	
+	public CurrentAttributeValuesCycleStep(EMiningFunctionSettings settings) throws MiningException {
+		super(settings);
+	}
+
+	public CurrentAttributeValuesCycleStep(EMiningFunctionSettings settings, Step ...steps) throws MiningException {
+		super(settings, steps);
+	}
+
+	@Override
+	protected EMiningModel initLoop(MiningInputStream inputData,
+			EMiningModel model) throws MiningException {
+		setStateParameter(model, EMiningModel.NAME_CURRENT_ATTRIBUTE_VALUE, 0);
+		//model.setCurrentAttributeValue(0);
+		
+		return model;
+	}
+
+	@Override
+	protected boolean conditionLoop(MiningInputStream inputData, EMiningModel model) throws MiningException {
+		ELogicalAttribute attribute = inputData.getLogicalData().getAttribute((Integer)getStateParameter(model, EMiningModel.NAME_CURRENT_ATTRIBUTE));
+		
+		return (Integer)getStateParameter(model, EMiningModel.NAME_CURRENT_ATTRIBUTE_VALUE) < attribute.getCategoricalProperties().getSize();
+	}
+
+	@Override
+	protected EMiningModel beforeIteration(MiningInputStream inputData, EMiningModel model) throws MiningException {
+		// TODO Auto-generated method stub
+		return model;
+	}
+
+	@Override
+	protected EMiningModel afterIteration(MiningInputStream inputData, EMiningModel model) throws MiningException {
+		//model.setCurrentAttributeValue(model.getCurrentAttributeValue() + 1);
+		setStateParameter(model, EMiningModel.NAME_CURRENT_ATTRIBUTE_VALUE, (Integer)getStateParameter(model, EMiningModel.NAME_CURRENT_ATTRIBUTE_VALUE) + 1);
+
+  		return model;
+	}
+
+}

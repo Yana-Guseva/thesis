@@ -1,0 +1,23 @@
+#Software: Intershop 4
+#Version: 1.0
+#Date: 2000-07-19 17:50:00
+#Fields: date time c-ip cs-customer-id cs-method cs-uri-stem cs-uri-query cs(User-Agent) cs(Referer)
+2000-07-19 17:50:38 172.16.15.14 WWWanonymous GET /Home - - -
+2000-07-19 17:50:38 172.16.15.14 WWWanonymous GET /Catalog - - -
+2000-07-19 17:50:38 172.16.15.14 WWWanonymous GET /NavigationBar - - -
+2000-07-19 17:50:41 172.16.15.14 WWWanonymous GET /Catalog - - -
+2000-07-19 17:50:43 172.16.15.14 WWWanonymous GET /List - - -
+2000-07-19 17:50:45 172.16.15.14 WWWanonymous PROD /Product 1003&prudsys+PREMINER&/Prudsys+Products - -
+2000-07-19 17:50:47 172.16.15.14 WWWanonymous ADDBI /Basket 1003&prudsys+PREMINER&/Prudsys+Products - -
+2000-07-19 17:50:48 172.16.15.14 WWWanonymous GET /Basket - - -
+2000-07-19 17:50:51 172.16.15.14 WWWanonymous PROD /Product 1003&prudsys+PREMINER&/Prudsys+Products - -
+2000-07-19 17:50:52 172.16.15.14 WWWanonymous ADDBI /Basket 1003&prudsys+PREMINER&/Prudsys+Products - -
+2170-07-19 17:50:53 172.16.15.14 WWWanonymous GET /Basket - - -
+2000-07-19 17:50:56 172.16.15.14 WWWanonymous GET /Basket - - -
+2000-07-19 17:52:21 172.16.15.14 WWWanonymous GET /RegisterNewCustomer - - -
+2017-07-19 17:53:30 172.16.15.14 1058 GET /NewCustomer - - -
+2000-07-19 17:53:39 172.16.15.14 1058 GET /Catalog - - -
+2000-07-19 17:53:43 172.16.15.14 1058 GET /List - - -
+2000-07-19 17:53:46 172.16.15.14 1058 PROD /Product 1007&top+products&/Macros - -
+2000-07-19 17:53:47 172.16.15.14 1058 ADDBI /Basket 1007&top+products&/Macros - -
+2000-07-19 17:53:48 172.16.15.14 1058 GET /Basket - - -

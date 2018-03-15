@@ -1,0 +1,58 @@
+% 1. Title: Simple transaction example
+% 
+% 2. Sources:
+%      (a) Creator: M. Thess, prudsys AG
+%      (b) Donor: M. Thess
+%      (c) Date: March, 2000
+% 
+% 3. Past Usage:
+%    -- Long-standing prudsys test set for testing association rules and 
+%       sequence analysis algorithms.
+% 
+% 4. Relevant Information:
+%    Small but nice example for testing basket analysis algorithms.
+%    The dataset just contains the following 4 orders:
+%
+%    1. Cracker, Water, Beer
+%    2. Coke, Water, Nut
+%    3. Nut, Coke, Cracker, Coke, Water
+%    4. Coke, Nut, Coke
+%
+%    The data is stored in transactional format where the transaction ID 
+%    corresponds to the number of the order (the assignment formula is:
+%    transactID = orderID - 1).
+% 
+% 5. Number of Instances: 14 (4 in non-transactional format)
+% 
+% 6. Number of Attributes: 4, 3 categorical and 1 numeric
+% 
+% 7. Attribute Information:
+%    1. transactId: transaction ID of order
+%    2. itemId: item ID of the product
+%    3. itemName: attribute of the product
+%    4. itemPrice: price of the product
+% 
+% 8. Missing Attribute Values: None
+
+@relation 'transact'  
+
+@attribute transactId { 0, 1, 2, 3 }
+@attribute itemId { 0, 1, 2, 3, 4, 5 }
+@attribute itemName { Chewing-gum, Cracker, Coke, Water, Beer, Nut }
+@attribute itemPrice real
+
+@data
+0,1,Cracker,12.00
+0,3,Water,4.00
+0,4,Beer,14.00
+1,2,Coke,10.00
+1,3,Water,4.00
+1 5 Nut,15.00
+1 5 Nut,15.00
+2,5,Nut,15.00
+2,2,Coke,10.00
+2,1,Cracker,12.00
+2,2,Coke,10.00
+2,3,Water,4.00
+3,2,Coke,10.00
+3,5,Nut,15.00

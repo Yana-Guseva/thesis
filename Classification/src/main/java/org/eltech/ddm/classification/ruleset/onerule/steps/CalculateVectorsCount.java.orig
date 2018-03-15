@@ -1,0 +1,50 @@
+package org.eltech.ddm.classification.ruleset.onerule.steps;
+
+import org.eltech.ddm.classification.ClassificationFunctionSettings;
+import org.eltech.ddm.classification.ruleset.onerule.OneRuleMiningModel;
+import org.eltech.ddm.inputdata.MiningArrayStream;
+import org.eltech.ddm.inputdata.MiningInputStream;
+import org.eltech.ddm.inputdata.MiningVector;
+import org.eltech.ddm.miningcore.MiningException;
+import org.eltech.ddm.miningcore.algorithms.Step;
+import org.eltech.ddm.miningcore.miningdata.ELogicalAttribute;
+import org.eltech.ddm.miningcore.miningfunctionsettings.EMiningFunctionSettings;
+import org.eltech.ddm.miningcore.miningmodel.EMiningModel;
+
+public class CalculateVectorsCount extends Step {
+	private final ELogicalAttribute target;
+	private final int indexTarget;
+	
+	public CalculateVectorsCount(EMiningFunctionSettings settings) throws MiningException {
+		super(settings);
+		
+		target = ((ClassificationFunctionSettings) settings).getTarget();
+		indexTarget = ((ClassificationFunctionSettings) settings).getLogicalData().getAttributeIndex( target );
+	}
+
+	@Override
+	protected EMiningModel execute(MiningInputStream inputData, EMiningModel model) throws MiningException {
+		int cv = (Integer)getStateParameter(model, EMiningModel.NAME_CURRENT_VECTOR);  //model.getCurrentAttribute();
+
+		return execute(cv,
+						(Integer)getStateParameter(model, EMiningModel.NAME_CURRENT_ATTRIBUTE),
+					   inputData.getVector(cv),
+					   (OneRuleMiningModel)model);
+	}
+	
+	
+	protected EMiningModel execute(int indexCurrentVector, int indexCurrentAttribute, MiningVector vector, OneRuleMiningModel model) throws MiningException{
+
+		if(vector.isMissing(indexCurrentAttribute)){
+			model.setMissingValueCount(indexCurrentAttribute,(int) vector.getValue(indexCurrentAttribute), 
+					model.getMissingValueCount(indexCurrentAttribute,(int) vector.getValue(indexCurrentAttribute)) + 1);  
+		}
+		else{
+			model.setCount(indexCurrentAttribute, (int)vector.getValue(indexCurrentAttribute), (int)vector.getValue(indexTarget),
+					model.getCount(indexCurrentAttribute, (int) vector.getValue(indexCurrentAttribute), (int)vector.getValue(indexTarget)) + 1);
+		}
+		
+		return model;
+	}
+
+}

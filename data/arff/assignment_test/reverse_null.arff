@@ -1,0 +1,11 @@
+@relation reverse_null
+@attribute A {x, y, NULL}
+@attribute B {x, y, NULL}
+@attribute C {x, y, NULL}
+@attribute D {x, y, NULL}
+@attribute E {x, y, NULL}
+
+@data
+x,y,NULL,NULL,NULL
+y,NULL,NULL,NULL,NULL
+NULL,y,NULL,NULL,NULL

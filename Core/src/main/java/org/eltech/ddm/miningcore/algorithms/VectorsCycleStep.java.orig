@@ -1,0 +1,49 @@
+package org.eltech.ddm.miningcore.algorithms;
+
+import org.eltech.ddm.inputdata.MiningInputStream;
+import org.eltech.ddm.miningcore.MiningException;
+import org.eltech.ddm.miningcore.miningfunctionsettings.EMiningFunctionSettings;
+import org.eltech.ddm.miningcore.miningmodel.EMiningModel;
+import org.omg.java.cwm.analysis.datamining.miningcore.miningfunctionsettings.MiningFunctionSettings;
+import org.omg.java.cwm.analysis.datamining.miningcore.miningmodel.MiningModel;
+
+public class VectorsCycleStep extends CycleStep {
+
+	public VectorsCycleStep(EMiningFunctionSettings settings) throws MiningException {
+		super(settings);
+	}
+
+    public VectorsCycleStep(EMiningFunctionSettings settings, Step ...steps) throws MiningException {
+		super(settings, steps);
+	}
+
+
+	@Override
+	protected boolean conditionLoop(MiningInputStream inputData, EMiningModel model) throws MiningException {
+		return  (Integer)getStateParameter(model, EMiningModel.NAME_CURRENT_VECTOR) < inputData.getVectorsNumber();
+		//return model.getCurentVector() < inputData.getVectorsNumber();
+	}
+
+	@Override
+	protected EMiningModel initLoop(MiningInputStream inputData, EMiningModel model) throws MiningException {
+		setStateParameter(model, EMiningModel.NAME_CURRENT_VECTOR, 0);
+		//model.setCurentVector(0);
+		return model;
+	}
+
+	@Override
+	protected EMiningModel beforeIteration(MiningInputStream inputData, EMiningModel model) throws MiningException {
+		//inputData.move(((EMiningModel)model).getCurentVector());
+
+		return model;
+	}
+
+	@Override
+	protected EMiningModel afterIteration(MiningInputStream inputData, EMiningModel model) throws MiningException {
+		setStateParameter(model, EMiningModel.NAME_CURRENT_VECTOR, (Integer)getStateParameter(model, EMiningModel.NAME_CURRENT_VECTOR) +1 );
+		//model.setCurentVector(		model.getCurentVector() + 1);
+
+		return model;
+	}
+
+}

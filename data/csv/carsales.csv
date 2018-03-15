@@ -1,0 +1,11 @@
+number, product, country, city, time, channel, sales, cost
+0, Alfa, Italy, Rome, Mon, direct, 20000, 15500
+1, Alfa, Greece, Rhodos, Thu, partner, 12000, 11000
+2, Citroen, Greece, Athens, Tue, direct, 18000, 17800
+3, BMW, UK, Bristol, Fri, partner, 45000, 38000
+4, Alfa, Greece, Athens, Tue, direct, 20000, 14000
+5, Daewoo, Italy, Napoli, Tue, ?, 9000, 8000
+6, Daewoo, Italy, Mailand, Fri, partner, 5000, 6500
+7, Alfa, Greece, Athens, Wed, direct, 17512, 17512
+8, BMW, Greece, Athens, Wed, partner, 31000, 30000
+9, Daewoo, Italy, Pisa, Tue, direct, 11000, 10250

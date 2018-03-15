@@ -1,0 +1,73 @@
+package org.eltech.ddm.classification.ruleset.onerule.steps;
+
+import org.eltech.ddm.classification.ruleset.RuleSetModel;
+import org.eltech.ddm.classification.ruleset.SimpleRule;
+import org.eltech.ddm.classification.ruleset.onerule.OneRuleMiningModel;
+import org.eltech.ddm.classification.ClassificationFunctionSettings;
+import org.eltech.ddm.classification.Operator;
+import org.eltech.ddm.classification.SimplePredicate;
+import org.eltech.ddm.inputdata.MiningInputStream;
+import org.eltech.ddm.inputdata.MiningVector;
+import org.eltech.ddm.miningcore.MiningException;
+import org.eltech.ddm.miningcore.algorithms.Step;
+import org.eltech.ddm.miningcore.miningdata.ELogicalAttribute;
+import org.eltech.ddm.miningcore.miningfunctionsettings.EMiningFunctionSettings;
+import org.eltech.ddm.miningcore.miningmodel.EMiningModel;
+
+public class AddingOneRule extends Step {
+
+	private final ELogicalAttribute target;
+	private final int indexTarget;
+
+	public AddingOneRule(EMiningFunctionSettings settings)
+													throws MiningException {
+		super(settings);
+		target = ((ClassificationFunctionSettings) settings).getTarget();
+		indexTarget = ((ClassificationFunctionSettings) settings).getLogicalData().getAttributeIndex( target );
+	}
+
+	@Override
+	protected EMiningModel execute(MiningInputStream inputData, EMiningModel model) throws MiningException {
+		int indexCurrentAttribute = (Integer)getStateParameter(model, EMiningModel.NAME_CURRENT_ATTRIBUTE); // model.getCurrentAttribute();
+		ELogicalAttribute attribute =  inputData.getLogicalData().getAttribute(indexCurrentAttribute);
+		int indexValue = (Integer)getStateParameter(model, EMiningModel.NAME_CURRENT_ATTRIBUTE_VALUE); //model.getCurrentAttributeValue();
+		//System.out.println("Thread [" + Thread.currentThread().getName() + "]: vector: " + currentVector);
+		
+		return execute(indexCurrentAttribute, 
+					indexValue, 
+					attribute, 
+					(OneRuleMiningModel)model);
+	}
+
+	protected EMiningModel execute(int indexCurrentAttribute, int indexValue, ELogicalAttribute attribute, OneRuleMiningModel model) throws MiningException {
+
+	    int maximum = 0;
+	    int maxIndex = 0;
+	    int summ = 0;
+
+	    int size = target.getCategoricalProperties().getSize();
+	    for (int i = 0; i < size; i++) {
+	      if ((i == 0) || (model.getCount(indexCurrentAttribute, indexValue, i) > maximum)) {
+	        maxIndex = i;
+	        maximum = model.getCount(indexCurrentAttribute, indexValue, i);
+	      }
+	      summ += model.getCount(indexCurrentAttribute, indexValue, i); 
+	    }
+	      
+		SimplePredicate predicate = new SimplePredicate(attribute, indexValue, Operator.EQUAL); // TODO: need know about value
+		SimpleRule r  = new SimpleRule(predicate);
+		r.setNumberOfPredicatedVectors(model.getCount(indexCurrentAttribute, indexValue, maxIndex));
+		r.setScore(target.getCategoricalProperties().getValue(maxIndex).toString());
+		if(summ > 0)
+			r.setError(1 - model.getCount(indexCurrentAttribute, indexValue, maxIndex)/summ);
+		model.addRuleCandidate(r);
+		model.setCandidateCorrectVectors(model.getCandidateCorrectVectors()
+				+ model.getCount(indexCurrentAttribute, indexValue, maxIndex)); 
+		
+		return model;
+	}
+	
+	
+
+
+}

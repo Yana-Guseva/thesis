@@ -1,0 +1,36 @@
+package org.eltech.ddm.classification.steps;
+
+import org.eltech.ddm.classification.ClassificationFunctionSettings;
+import org.eltech.ddm.inputdata.MiningInputStream;
+import org.eltech.ddm.miningcore.MiningException;
+import org.eltech.ddm.miningcore.algorithms.DecisionStep;
+import org.eltech.ddm.miningcore.algorithms.Step;
+import org.eltech.ddm.miningcore.algorithms.StepSequence;
+import org.eltech.ddm.miningcore.miningdata.ELogicalAttribute;
+import org.eltech.ddm.miningcore.miningfunctionsettings.EMiningFunctionSettings;
+import org.eltech.ddm.miningcore.miningmodel.EMiningModel;
+
+public class IfCurrentAttributNotTarget extends DecisionStep {
+	private final ELogicalAttribute target;
+
+	public IfCurrentAttributNotTarget(EMiningFunctionSettings settings,
+			Step ...trueSteps) throws MiningException {
+		super(settings, trueSteps);
+		target = ((ClassificationFunctionSettings) settings).getTarget();
+	}
+	
+	public IfCurrentAttributNotTarget(EMiningFunctionSettings settings, StepSequence trueSteps, Step ...falseSteps) throws MiningException {
+		super(settings, trueSteps, falseSteps);
+		target = ((ClassificationFunctionSettings) settings).getTarget();
+		
+	}
+
+	@Override
+	protected boolean condition(MiningInputStream inputData, EMiningModel model) throws MiningException {
+		int indexCurrentAttribute = (Integer)getStateParameter(model, EMiningModel.NAME_CURRENT_ATTRIBUTE); // model.getCurrentAttribute();
+		ELogicalAttribute attribute =  inputData.getLogicalData().getAttribute(indexCurrentAttribute);
+
+		return !attribute.equals(target);
+	}
+
+}

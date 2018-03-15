@@ -1,0 +1,12 @@
+@relation reverse_true
+@attribute A {false, true}
+@attribute B {false, true}
+@attribute C {false, true}
+@attribute D {false, true}
+@attribute E {false, true}
+
+@data
+true,true,false,true,true
+true,true,false,false,false
+false,false,false,true,false
+true,true,false,false,false

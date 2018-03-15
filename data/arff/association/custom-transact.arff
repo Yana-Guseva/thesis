@@ -1,0 +1,77 @@
+% 1. Title: Simple sequential transaction example
+% 
+% 2. Sources:
+%      (a) Creator: V. Boritchev, ZSoft, M. Thess, prudsys AG
+%      (b) Donor: M. Thess
+%      (c) Date: November, 2001
+% 
+% 3. Past Usage:
+%    -- test set for testing sequential basket analysis algorithms.
+% 
+% 4. Relevant Information:
+%    Motivated by the 'transact' dataset for association and sequence
+%    analysis, this dataset was constructed as its counterpart for
+%    sequential basket analysis. As application example, clickstream
+%    analysis of customers of an on-line shop was used.
+%  
+%    It is a simple example containing the information of the web sessions
+%    of 3 customers of an on-line shop:
+%
+%    1. {index.html, product.html, catalog.html}, {about.html, product.html, order.html}
+%    2. {index.html, about.html, product.html, order.html, about.html}, 
+%       {about.html, order.html, about.html}
+%    3. {product.html, order.html, about.html}, {index.html, order.html, catalog.html},
+%       {product.html, index.html, order.html, about.html}
+%    
+%    The web pages within a curl-pair belong to one web session. In contrast to
+%    sequence analysis, here the order of page accesses within a web session is ignored.
+%    However, the order of the web sessions for every customer is important.
+%
+%    These 3 customer transactions are transformed in transactional format.  
+% 
+% 5. Number of Instances: 24
+% 
+% 6. Number of Attributes: 4, 3 categorical and 1 numeric
+% 
+% 7. Attribute Information:
+%    1. customerId: customer
+%    2. itemId: item ID
+%    3. transactionPosition: number of transaction of a customer, based on Session ID
+%    4. itemName: item attribute
+% 
+% 8. Missing Attribute Values: None
+
+@relation custom_transact
+
+@attribute customerId string
+@attribute itemId {item_1, item_2, item_3, item_4, item_5}
+@attribute transactionPosition real
+@attribute itemName {index.html, about.html, product.html, catalog.html, order.html}
+
+@data
+cust_1,item_1,0,index.html
+cust_1,item_3,0,product.html
+cust_1,item_4,0,catalog.html
+cust_1,item_2,1,about.html
+cust_1,item_3,1,product.html
+cust_1,item_5,1,order.html
+cust_1,item_3,1,product.html
+
+cust_2,item_1,0,index.html
+cust_2,item_2,0,about.html
+cust_2,item_3,0,product.html
+cust_2,item_5,0,order.html
+cust_2,item_2,0,about.html
+
+cust_3,item_2,1,about.html
+cust_3,item_5,1,order.html
+cust_3,item_3,0,product.html
+cust_3,item_5,0,order.html
+cust_3,item_2,0,about.html
+cust_3,item_1,1,index.html
+cust_3,item_5,1,order.html
+cust_3,item_4,1,catalog.html
+cust_3,item_3,2,product.html
+cust_3,item_1,2,index.html
+cust_3,item_5,2,order.html
+cust_3,item_2,2,about.html

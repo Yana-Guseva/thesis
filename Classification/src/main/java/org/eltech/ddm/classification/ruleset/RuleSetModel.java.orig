@@ -1,0 +1,194 @@
+package org.eltech.ddm.classification.ruleset;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+
+import org.eltech.ddm.classification.ClassificationMiningModel;
+import org.eltech.ddm.classification.SimplePredicate;
+import org.eltech.ddm.inputdata.MiningVector;
+import org.eltech.ddm.miningcore.MiningException;
+import org.eltech.ddm.miningcore.miningfunctionsettings.EMiningFunctionSettings;
+import org.eltech.ddm.miningcore.miningmodel.EMiningModel;
+import org.eltech.ddm.miningcore.miningmodel.IParallelMiningModel;
+
+public class RuleSetModel extends ClassificationMiningModel implements IParallelMiningModel {
+
+//	protected HashMap<SimplePredicate, SimpleRule> maprules = new HashMap<SimplePredicate, SimpleRule>();
+	protected List<SimpleRule> rules = new ArrayList<SimpleRule>();
+	
+	protected int correctVectors = 0;
+	protected int candidateCorrectVectors = 0;
+
+//	private int currentRule = 0;
+	
+
+	// ======= current state of model (build model task) ==================
+	static public final String NAME_CURRENT_RULE = "currentRule"; 
+
+	public RuleSetModel(EMiningFunctionSettings settings)
+			throws MiningException {
+		super(settings);
+		// TODO Auto-generated constructor stub
+	}
+
+
+	public int getNumberOfRules() {
+		return rules.size();
+	}
+
+	public SimpleRule getRule(int index) {
+		if(index < rules.size())
+			return rules.get(index);
+		else
+			return null;
+	}
+
+//	public SimpleRule getRule(SimplePredicate predicate) {
+//		return maprules.get(predicate);
+//	}
+
+	public void addRule(SimpleRule rule) {
+		rules.add(rule);
+		//int index = rules.indexOf(rule);
+		//maprules.put(rule.getPredicate(), rule);
+		
+		//return index;
+	}
+
+	public void removeRule(SimpleRule rule) {
+//		SimpleRule r = rules.get(index);
+		rules.remove(rule);
+//		maprules.remove(r.getPredicate());
+	}
+	
+	public void removeRule(int indexRule) {
+//		SimpleRule r = rules.get(index);
+		rules.remove(indexRule);
+//		maprules.remove(r.getPredicate());
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder stringBuilder = new StringBuilder();
+		for (SimpleRule simpleRule : rules){
+			if(simpleRule != null)
+				stringBuilder.append(simpleRule.toString()).append("\n");
+			else
+				stringBuilder.append("null").append("\n");
+		}
+		return stringBuilder.toString();
+	}
+
+
+
+	@Override
+	public double apply(MiningVector miningVector) throws MiningException {
+		double result = Double.NaN;
+		double minError = Double.MAX_VALUE;
+		for(SimpleRule rule: rules){
+			if (rule.getPredicate().checkVector(miningVector)){
+				if(minError > rule.getError()){
+					minError = rule.getError();
+					result = target.getCategoricalProperties().getIndex(rule.getScore());
+				}
+			}
+		}
+
+		return result;
+	}
+
+
+//	public int getCurrentRule() {
+//		return currentRule;
+//	}
+//
+//	public void setCurrentRule(int currentRuleIndex) {
+//		this.currentRule = currentRuleIndex;
+//	}
+
+	public Object clone() {
+		RuleSetModel o = null;
+		o = (RuleSetModel)super.clone();
+
+//		o.maprules = new HashMap<SimplePredicate, SimpleRule>();
+//		o.maprules.putAll(maprules);
+		o.rules = new LinkedList<SimpleRule>();
+		o.rules.addAll(rules);
+
+//	    o.currentRule = currentRule;
+
+		return o;
+	}
+
+
+	@Override
+	public void join(List<EMiningModel> joinModels) throws MiningException {
+		for(EMiningModel model: joinModels){
+			RuleSetModel rm = (RuleSetModel)model;
+			if (rm == this) continue;
+			for(int i = 0; i < rm.getNumberOfRules(); i++){
+				SimpleRule sr = rm.getRule(i);
+				boolean fNewRule = true;
+				for(SimpleRule rule: rules){
+					if(rule.equals(sr)){
+						rule.setError((rule.getError()*rule.getNumberOfPredicatedVectors() + sr.getError()*sr.getNumberOfPredicatedVectors())/
+															(rule.getNumberOfPredicatedVectors() + sr.getNumberOfPredicatedVectors()));
+						rule.setNumberOfPredicatedVectors(rule.getNumberOfPredicatedVectors() + sr.getNumberOfPredicatedVectors());
+						fNewRule = false;
+					}
+				}
+				if(fNewRule)
+					addRule(sr);
+			}
+		}
+	}
+
+
+	@Override
+	public List<EMiningModel> split(int handlerCount) throws MiningException {
+		ArrayList<EMiningModel> models = new ArrayList<EMiningModel>(handlerCount);
+		
+		for(int i=0; i < handlerCount; i++){
+			models.add((EMiningModel)this.clone());
+		}
+		
+		return models;
+	}
+
+
+//	public int getCurentRule() {
+//		// TODO Auto-generated method stub
+//		return currentRule;
+//	}
+//
+//
+//	public void setCurentRule(int value) {
+//		// TODO Auto-generated method stub
+//		currentRule  = value;
+//	}
+
+
+	public int getCorrectVectors() {
+		return correctVectors;
+	}
+
+
+	public void setCorrectVectors(int correctVectors) {
+		this.correctVectors = correctVectors;
+	}
+
+
+	public int getCandidateCorrectVectors() {
+		return candidateCorrectVectors;
+	}
+
+
+	public void setCandidateCorrectVectors(int candidateCorrectVectors) {
+		this.candidateCorrectVectors = candidateCorrectVectors;
+	}
+
+
+
+}
