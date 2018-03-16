@@ -4,89 +4,127 @@ import com.univocity.parsers.csv.CsvParser;
 import com.univocity.parsers.csv.CsvParserSettings;
 import org.eltech.ddm.inputdata.MiningVector;
 import org.eltech.ddm.miningcore.MiningException;
-import org.eltech.ddm.miningcore.miningdata.EAttributeAssignmentSet;
-import org.eltech.ddm.miningcore.miningdata.EDirectAttributeAssignment;
-import org.eltech.ddm.miningcore.miningdata.ELogicalAttribute;
-import org.eltech.ddm.miningcore.miningdata.ELogicalData;
-import org.eltech.ddm.miningcore.miningdata.EPhysicalData;
-import org.eltech.ddm.miningcore.miningdata.PhysicalAttribute;
+import org.eltech.ddm.miningcore.miningdata.*;
 import org.omg.java.cwm.analysis.datamining.miningcore.miningdata.AttributeType;
 
 import javax.datamining.data.AttributeDataType;
 import java.io.InputStreamReader;
-import java.util.Arrays;
+import java.io.Reader;
 import java.util.stream.Stream;
 
+/**
+ * This class is an adapter for CSV Parser from Univocity Team.
+ * Basically, it encapsulates logic for reading CSV data effectively
+ * without loading it into memory.
+ * Parser could be configured in a different way such as:
+ * <p>
+ * 1) Read rows of the file (Horizontal Separation)
+ * 2) Read columns of the file (Vertical Separation)
+ * 3) Batching input in case of the large data
+ * 4) Separate thread option in order not to lock the main thread
+ * <p>
+ * All settings could be found in {@link CsvParserSettings}
+ * For different type of row processing please see implementation of
+ *
+ * @author etitkov
+ * @see com.univocity.parsers.common.processor.RowProcessor
+ * @see com.univocity.parsers.common.Context
+ * @see com.univocity.parsers.common.processor.RowListProcessor
+ * @see com.univocity.parsers.common.processor.ColumnProcessor
+ */
 public class MiningCsvStream extends MiningFileStream {
 
+    /*
+     * Required fields for using parser
+     */
     private CsvParser parser;
-    private CsvParserSettings settings;
+    private final CsvParserSettings settings;
 
-
+    /**
+     * Default constructor with configuration provider. If configuration is {@code null}
+     * the the default one will be used instead;
+     *
+     * @param file     - relative path to the data file
+     * @param settings - parser setting to apply
+     * @throws MiningException - in case of failure
+     */
     public MiningCsvStream(String file, CsvParserSettings settings) throws MiningException {
         super(file);
         this.settings = settings;
-        this.parser = new CsvParser(settings);
         if (logicalData == null) {
             physicalData = recognize();
         }
-        open();
-
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public MiningVector readPhysicalRecord() {
+        open();
         String[] row = parser.parseNext();
         if (row != null) {
-            System.out.println(Arrays.toString(row));
             double[] values = Stream.of(row).mapToDouble(Double::valueOf).toArray();
             MiningVector vector = new MiningVector(values);
             vector.setLogicalData(logicalData);
             vector.setIndex(++cursorPosition);
             return vector;
-
         }
         return null;
 
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    protected MiningVector movePhysicalRecord(int position) throws MiningException {
-        MiningVector vector = null;
-        for (int i = 0; i < position; i++) {
-            vector = readPhysicalRecord();
-            if (vector == null) {
-                reset();
-                vector = readPhysicalRecord();
-            }
-        }
-        return vector;
-
+    public void reset() {
+        cursorPosition = -1;
+        parser.stopParsing();
+        parser.beginParsing(getReader());
+        open = true;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void open() {
-        this.parser.beginParsing(new InputStreamReader(this.getClass().getClassLoader().getResourceAsStream(fileName)));
-        this.open = true;
+        if (!isOpen()) {
+            this.open = true;
+            this.parser = new CsvParser(settings);
+            this.parser.beginParsing(getReader());
+        }
     }
 
+    /**
+     * Utility method for getting  input stream of the resource;
+     *
+     * @return - reader for parser
+     */
+    private Reader getReader() {
+        return new InputStreamReader(this.getClass().getClassLoader().getResourceAsStream(fileName));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void close() {
+        this.open = false;
         this.parser.stopParsing();
     }
 
-
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public EPhysicalData recognize() throws MiningException {
         if (logicalData == null && physicalData == null && attributeAssignmentSet == null) {
-            boolean wasOpen;
-            if (!(wasOpen = isOpen())) {
-                this.open();
-            }
+            open();
             logicalData = new ELogicalData();
             physicalData = new EPhysicalData();
             attributeAssignmentSet = new EAttributeAssignmentSet();
-
             for (String attrName : parser.getContext().parsedHeaders()) {
                 ELogicalAttribute la = new ELogicalAttribute(attrName, AttributeType.numerical);
                 PhysicalAttribute pa = new PhysicalAttribute(attrName, AttributeType.numerical, AttributeDataType.doubleType);
@@ -97,18 +135,52 @@ public class MiningCsvStream extends MiningFileStream {
                 da.setAttribute(pa);
                 attributeAssignmentSet.addAssignment(da);
             }
-
-
-            if (wasOpen) {
-                reset();
-            } else {
-                close();
-            }
-            this.settings.setHeaderExtractionEnabled(true);
+            close();
             return physicalData;
         }
         return physicalData;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected MiningVector movePhysicalRecord(int position) throws MiningException {
+        if (getCurrentPosition() > position) {
+            reset();
+        }
+        return advancePosition(position);
+    }
 
+    /**
+     * Advance current position forward to the  value passed in the
+     * method.
+     *
+     * @param position - position to reach
+     * @return - mining vector for reached position
+     * @throws MiningException - in case of failure during file parsing
+     */
+    private MiningVector advancePosition(int position) throws MiningException {
+        MiningVector mv;
+        do {
+            mv = next();
+        }
+        while ((mv != null) && (getCurrentPosition() < position));
+        return mv;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int getVectorsNumber() {
+        return parser.parseAll(getReader()).size();
+    }
+
+    @Override
+    public String toString() {
+        return "MiningCsvStream{" +
+                ", currentPosition=" + cursorPosition +
+                '}';
+    }
 }
