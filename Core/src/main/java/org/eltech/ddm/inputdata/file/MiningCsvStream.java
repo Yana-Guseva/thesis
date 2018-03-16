@@ -1,5 +1,7 @@
 package org.eltech.ddm.inputdata.file;
 
+import com.univocity.parsers.common.ParsingContext;
+import com.univocity.parsers.common.processor.AbstractRowProcessor;
 import com.univocity.parsers.csv.CsvParser;
 import com.univocity.parsers.csv.CsvParserSettings;
 import org.eltech.ddm.inputdata.MiningVector;
@@ -174,7 +176,24 @@ public class MiningCsvStream extends MiningFileStream {
      */
     @Override
     public int getVectorsNumber() {
-        return parser.parseAll(getReader()).size();
+        if (vectorsNumber <= 0) {
+            RowCountProcessor processor = new RowCountProcessor();
+            CsvParserSettings settings = new CsvParserSettings();
+            settings.setProcessor(processor);
+            CsvParser parser = new CsvParser(settings);
+            parser.parse(getReader());
+            vectorsNumber = processor.rowCount;
+        }
+        return vectorsNumber;
+    }
+
+    private static class RowCountProcessor extends AbstractRowProcessor {
+        private int rowCount;
+
+        @Override
+        public void rowProcessed(String[] row, ParsingContext context) {
+            rowCount++;
+        }
     }
 
     @Override
