@@ -1,5 +1,6 @@
 package org.eltech.ddm.classification.naivebayes.continious;
 
+import com.univocity.parsers.csv.CsvFormat;
 import com.univocity.parsers.csv.CsvParserSettings;
 import org.eltech.ddm.classification.ClassificationFunctionSettings;
 import org.eltech.ddm.environment.ConcurrencyExecutionEnvironment;
@@ -27,13 +28,15 @@ public class ContinuousNaiveBayesAlgorithmTest {
     private ClassificationFunctionSettings miningSettings;
 
 
+
     @Before
     public void setUp() throws Exception {
         CsvParserSettings settings = new CsvParserSettings();
         settings.setDelimiterDetectionEnabled(true);
         settings.setHeaderExtractionEnabled(true);
+        settings.setNormalizeLineEndingsWithinQuotes(true);
 
-        this.inputData = new MiningCsvStream("diabet-data.csv", settings);
+        this.inputData = new MiningCsvStream("di.csv", settings);
     }
 
 

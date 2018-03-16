@@ -81,7 +81,7 @@ public abstract class MiningInputStream implements Cloneable, Serializable //ext
     /** True, if <code>MiningInputStream</code> is open. */
     protected boolean open = false;
 
-    private int vectorsNumber = 0;
+    protected int vectorsNumber = 0;
 
     private int offsetVectorIndex = 0;
 

@@ -5,9 +5,7 @@ import org.eltech.ddm.classification.naivebayes.continious.steps.FindMeanAndDevi
 import org.eltech.ddm.classification.naivebayes.continious.steps.FindMeanAndDeviationStep;
 import org.eltech.ddm.inputdata.MiningInputStream;
 import org.eltech.ddm.miningcore.MiningException;
-import org.eltech.ddm.miningcore.algorithms.MiningAlgorithm;
-import org.eltech.ddm.miningcore.algorithms.MiningLoopVectors;
-import org.eltech.ddm.miningcore.algorithms.MiningSequence;
+import org.eltech.ddm.miningcore.algorithms.*;
 import org.eltech.ddm.miningcore.miningfunctionsettings.EMiningFunctionSettings;
 import org.eltech.ddm.miningcore.miningmodel.EMiningModel;
 
@@ -30,8 +28,10 @@ public class ContinuousNaiveBayesAlgorithm extends MiningAlgorithm {
     @Override
     public MiningSequence getSequenceAlgorithm() throws MiningException {
         return new MiningSequence(miningSettings,
-                new CalculateSumStep(miningSettings),
-                new FindMeanAndDeviationCycle(miningSettings, new FindMeanAndDeviationStep(miningSettings)));
+                new MiningParallel(miningSettings, MemoryType.shared,
+                        new MiningLoopVectors(miningSettings,
+                                new CalculateSumStep(miningSettings)),
+                        new FindMeanAndDeviationCycle(miningSettings, new FindMeanAndDeviationStep(miningSettings))));
     }
 
     @Override
@@ -41,7 +41,7 @@ public class ContinuousNaiveBayesAlgorithm extends MiningAlgorithm {
 
     @Override
     public MiningSequence getHorDistributedAlgorithm() throws MiningException {
-        return getSequenceAlgorithm();
+        return null;
     }
 
     @Override

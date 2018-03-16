@@ -1,10 +1,12 @@
 package org.eltech.ddm.classification.naivebayes.continious;
 
 import org.eltech.ddm.classification.ClassificationMiningModel;
+import org.eltech.ddm.classification.naivebayes.category.TargetValueCount;
 import org.eltech.ddm.inputdata.MiningVector;
 import org.eltech.ddm.miningcore.MiningException;
 import org.eltech.ddm.miningcore.miningfunctionsettings.EMiningFunctionSettings;
 import org.eltech.ddm.miningcore.miningmodel.LogicalAttributeElement;
+import org.eltech.ddm.miningcore.miningmodel.LogicalAttributeValueElement;
 import org.eltech.ddm.miningcore.miningmodel.MiningModelElement;
 
 import java.util.*;
@@ -24,7 +26,7 @@ import java.util.stream.IntStream;
  */
 public class ContinuousBayesModel extends ClassificationMiningModel {
 
-    private final static int BAYES_MODEL = 1;
+    private final static int BAYES_INTUT_MODEL = 1;
     private final static int CLASS_LENGTHS = 2;
 
 
@@ -48,7 +50,7 @@ public class ContinuousBayesModel extends ClassificationMiningModel {
     public ContinuousBayesModel(EMiningFunctionSettings settings) throws MiningException {
         super(settings);
 
-        sets.add(BAYES_MODEL, new MiningModelElement("Input") {
+        sets.add(BAYES_INTUT_MODEL, new MiningModelElement("Input") {
             @Override
             protected String propertiesToString() {
                 return "";
@@ -77,7 +79,35 @@ public class ContinuousBayesModel extends ClassificationMiningModel {
     @Override
     public void initModel() throws MiningException {
         MiningModelElement attrs = getElement(INDEX_ATTRIBUTE_SET);
-        LogicalAttributeElement tlattr = (LogicalAttributeElement)attrs.getElement(indexTarget);
+        MiningModelElement target = attrs.getElement(indexTarget);
+
+        for(int i = 0; i < attrs.size(); i++) { // loop for attributes
+            MiningModelElement element = attrs.getElement(i);
+            String attrName = element.getID();
+            MiningModelElement attrElem = new MiningModelElement(attrName) {
+                @Override
+                protected String propertiesToString() {
+                    return "";
+                }
+
+                @Override
+                public void merge(List<MiningModelElement> elements) throws MiningException {
+                }
+            };
+            addElement(index(BAYES_INTUT_MODEL), attrElem);
+
+            System.out.println();
+
+//            for (int t = 0; t < values.size(); t++) { // loop for value of target attribute
+//                LogicalAttributeValueElement tlattrv = (LogicalAttributeValueElement) values.getElement(t);
+//                String catTrName = tlattrv.getValue().getName();
+//                TargetValueCount tvc = new TargetValueCount(attrName + "=" + catName + ";" + catTrName);
+//                addElement(index(BAYES_INTUT_MODEL, i, j), tvc);
+//            }
+        }
+
+
+
 
     }
 
