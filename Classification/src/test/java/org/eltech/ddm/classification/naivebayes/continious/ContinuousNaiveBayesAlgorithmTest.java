@@ -36,7 +36,7 @@ public class ContinuousNaiveBayesAlgorithmTest {
         settings.setHeaderExtractionEnabled(true);
         settings.setNormalizeLineEndingsWithinQuotes(true);
 
-        this.inputData = new MiningCsvStream("di.csv", settings);
+        this.inputData = new MiningCsvStream("diabet-data.csv", settings);
     }
 
 

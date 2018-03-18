@@ -5,3 +5,5 @@
 *.cld
 *.project
 *.classpath
+
+*.csv

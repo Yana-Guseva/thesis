@@ -68,4 +68,9 @@ public class FindMeanAndDeviationCycle extends MiningLoop {
         return model;
     }
 
+    @Override
+    public boolean isDataBlock() {
+        return false;
+    }
+
 }

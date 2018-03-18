@@ -1,10 +1,13 @@
 package org.eltech.ddm.classification.naivebayes.continious.steps;
 
 import org.eltech.ddm.classification.naivebayes.continious.ContinuousBayesModel;
+import org.eltech.ddm.inputdata.MiningInputStream;
 import org.eltech.ddm.miningcore.MiningException;
+import org.eltech.ddm.miningcore.algorithms.DataMiningBlock;
 import org.eltech.ddm.miningcore.algorithms.MiningBlock;
 import org.eltech.ddm.miningcore.miningfunctionsettings.EMiningFunctionSettings;
 import org.eltech.ddm.miningcore.miningmodel.EMiningModel;
+import org.eltech.ddm.miningcore.miningmodel.MiningModelElement;
 
 import java.util.stream.IntStream;
 
@@ -78,5 +81,8 @@ public class FindMeanAndDeviationStep extends MiningBlock {
         return values;
     }
 
-
+    @Override
+    public boolean isDataBlock() {
+        return false;
+    }
 }

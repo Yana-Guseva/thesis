@@ -29,9 +29,12 @@ public class ContinuousNaiveBayesAlgorithm extends MiningAlgorithm {
     public MiningSequence getSequenceAlgorithm() throws MiningException {
         return new MiningSequence(miningSettings,
                 new MiningParallel(miningSettings, MemoryType.shared,
-                        new MiningLoopVectors(miningSettings,
-                                new CalculateSumStep(miningSettings)),
-                        new FindMeanAndDeviationCycle(miningSettings, new FindMeanAndDeviationStep(miningSettings))));
+                        new MiningLoopVectors(miningSettings, new CalculateSumStep(miningSettings))),
+                new MiningParallel(miningSettings, MemoryType.shared,
+                        new FindMeanAndDeviationCycle(miningSettings, new FindMeanAndDeviationStep(miningSettings)))
+        );
+
+
     }
 
     @Override

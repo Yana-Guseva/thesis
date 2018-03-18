@@ -12,6 +12,7 @@ import org.omg.java.cwm.analysis.datamining.miningcore.miningdata.AttributeType;
 import javax.datamining.data.AttributeDataType;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.util.Arrays;
 import java.util.stream.Stream;
 
 /**
@@ -192,7 +193,9 @@ public class MiningCsvStream extends MiningFileStream {
 
         @Override
         public void rowProcessed(String[] row, ParsingContext context) {
-            rowCount++;
+            if (!Arrays.equals(row, context.parsedHeaders())){
+                rowCount++;
+            }
         }
     }
 
