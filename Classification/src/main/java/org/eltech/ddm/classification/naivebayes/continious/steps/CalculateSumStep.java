@@ -37,9 +37,7 @@ public class CalculateSumStep extends DataMiningBlock {
     @Override
     public EMiningModel execute(MiningInputStream inputData, EMiningModel model) throws MiningException {
         ContinuousBayesModel algModel = (ContinuousBayesModel) model;
-
         double[] values = inputData.getVector(model.getCurrentVectorIndex()).getValues();
-        algModel.setAttrCount(values.length - 1);
         algModel.putValue((int) values[values.length - 1], array(values));
         return algModel;
     }

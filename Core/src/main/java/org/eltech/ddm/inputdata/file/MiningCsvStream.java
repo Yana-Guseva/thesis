@@ -67,11 +67,10 @@ public class MiningCsvStream extends MiningFileStream {
         open();
         String[] row = parser.parseNext();
         if (row != null) {
-            double[] values = Stream.of(row).mapToDouble(Double::valueOf).toArray();
+            double[] values = Stream.of(row).mapToDouble(value -> value == null ? 0d : Double.valueOf(value)).toArray();
             MiningVector vector = new MiningVector(values);
             vector.setLogicalData(logicalData);
             vector.setIndex(++cursorPosition);
-            return vector;
         }
         return null;
 
@@ -193,7 +192,7 @@ public class MiningCsvStream extends MiningFileStream {
 
         @Override
         public void rowProcessed(String[] row, ParsingContext context) {
-            if (!Arrays.equals(row, context.parsedHeaders())){
+            if (!Arrays.equals(row, context.parsedHeaders())) {
                 rowCount++;
             }
         }

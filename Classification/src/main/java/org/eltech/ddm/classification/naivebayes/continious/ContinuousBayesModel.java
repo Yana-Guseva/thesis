@@ -11,6 +11,7 @@ import org.eltech.ddm.miningcore.miningmodel.MiningModelElement;
 
 import java.util.*;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 /**
  * Represents model for Continues bayes Classifier algorithm.
@@ -27,19 +28,9 @@ import java.util.stream.IntStream;
 public class ContinuousBayesModel extends ClassificationMiningModel {
 
     private final static int BAYES_INTUT_MODEL = 1;
-    private final static int CLASS_LENGTHS = 2;
 
-
-    private int attrCount;
     private Double currentClassValue;
-
-    protected int length;
-    protected final Map<Double, double[][]> model = new HashMap<>();
-    protected final Map<Double, Integer> classLengths = new HashMap<>();
-
-    protected Set<Double> classValues = new LinkedHashSet<>();
-
-    protected Iterator<Double> iterator;
+    private Iterator<Double> iterator;
 
     /**
      * Default constructor for a class
@@ -49,39 +40,15 @@ public class ContinuousBayesModel extends ClassificationMiningModel {
      */
     public ContinuousBayesModel(EMiningFunctionSettings settings) throws MiningException {
         super(settings);
-
-        sets.add(BAYES_INTUT_MODEL, new MiningModelElement("Input") {
-            @Override
-            protected String propertiesToString() {
-                return "";
-            }
-
-            @Override
-            public void merge(List<MiningModelElement> elements) throws MiningException {
-
-            }
-        });
-        sets.add(CLASS_LENGTHS, new MiningModelElement("Class-Length") {
-            @Override
-            protected String propertiesToString() {
-                return "";
-            }
-
-            @Override
-            public void merge(List<MiningModelElement> elements) throws MiningException {
-
-            }
-        });
-
-
+        sets.add(BAYES_INTUT_MODEL, new BayesModelElement("Bayes Model"));
     }
 
     @Override
     public void initModel() throws MiningException {
         MiningModelElement attrs = getElement(INDEX_ATTRIBUTE_SET);
-        MiningModelElement target = attrs.getElement(indexTarget);
-
-        for(int i = 0; i < attrs.size(); i++) { // loop for attributes
+        BayesModelElement miningModelElement = (BayesModelElement) sets.get(BAYES_INTUT_MODEL);
+        miningModelElement.setAttrCount(attrs.size());
+        for (int i = 0; i < attrs.size(); i++) { // loop for attributes
             MiningModelElement element = attrs.getElement(i);
             String attrName = element.getID();
             MiningModelElement attrElem = new MiningModelElement(attrName) {
@@ -91,23 +58,11 @@ public class ContinuousBayesModel extends ClassificationMiningModel {
                 }
 
                 @Override
-                public void merge(List<MiningModelElement> elements) throws MiningException {
+                public void merge(List<MiningModelElement> elements) {
                 }
             };
             addElement(index(BAYES_INTUT_MODEL), attrElem);
-
-            System.out.println();
-
-//            for (int t = 0; t < values.size(); t++) { // loop for value of target attribute
-//                LogicalAttributeValueElement tlattrv = (LogicalAttributeValueElement) values.getElement(t);
-//                String catTrName = tlattrv.getValue().getName();
-//                TargetValueCount tvc = new TargetValueCount(attrName + "=" + catName + ";" + catTrName);
-//                addElement(index(BAYES_INTUT_MODEL, i, j), tvc);
-//            }
         }
-
-
-
 
     }
 
@@ -141,9 +96,11 @@ public class ContinuousBayesModel extends ClassificationMiningModel {
      */
     public Map<Double, Double> apply(double[] inputData) {
         Map<Double, Double> probabilities = new HashMap<>();
-        model.keySet().forEach(key -> {
+        BayesModelElement element = (BayesModelElement) sets.get(BAYES_INTUT_MODEL);
+
+        element.getModel().keySet().forEach(key -> {
             probabilities.put(key, 1D);
-            double[][] classAttributeList = model.get(key);
+            double[][] classAttributeList = element.getModel().get(key);
 
             for (int i = 0; i < classAttributeList.length; i++) {
                 double mean = classAttributeList[i][0];
@@ -162,7 +119,11 @@ public class ContinuousBayesModel extends ClassificationMiningModel {
      * @return - algorithm model
      */
     public Map<Double, double[][]> getModel() {
-        return model;
+        return ((BayesModelElement) sets.get(BAYES_INTUT_MODEL)).getModel();
+    }
+
+    private BayesModelElement getBayesElement() {
+        return (BayesModelElement) sets.get(BAYES_INTUT_MODEL);
     }
 
     /**
@@ -172,10 +133,10 @@ public class ContinuousBayesModel extends ClassificationMiningModel {
      * @param values - value to store
      */
     public void putValue(double key, double[] values) {
-        double[][] data = model.get(key) == null ? new double[values.length][2] : model.get(key);
+        double[][] data = getModel().get(key) == null ? new double[values.length][2] : getModel().get(key);
         fillArray(key, data, values);
-        length++;
-        classValues.add(key);
+        getBayesElement().incrementLength();
+        getBayesElement().getClassValues().add(key);
     }
 
     /**
@@ -186,25 +147,31 @@ public class ContinuousBayesModel extends ClassificationMiningModel {
      * @param values - values in fill in
      */
     private void fillArray(double key, double[][] data, double[] values) {
-        IntStream.range(0, values.length).forEach(attr -> {
-            data[attr][0] += values[attr];
-            data[attr][1] += values[attr] * values[attr];
-        });
-        model.put(key, data);
-        Integer length = classLengths.get(key);
-        if (length == null) {
-            classLengths.put(key, 1);
-        } else {
-            classLengths.put(key, ++length);
+        try {
+            IntStream.range(0, values.length).forEach(attr -> {
+                data[attr][0] += values[attr];
+                data[attr][1] += values[attr] * values[attr];
+            });
+            getModel().put(key, data);
+            Map<Double, Integer> classLengths = getBayesElement().getClassLengths();
+            Integer length = classLengths.get(key);
+            if (length == null) {
+                classLengths.put(key, 1);
+            } else {
+                classLengths.put(key, ++length);
+            }
+        } catch (Exception ex){
+            System.out.println("CATCHED");
         }
+
     }
 
     public void initIterator() {
-        this.iterator = classValues.iterator();
+        this.iterator = getBayesElement().getClassValues().iterator();
     }
 
     public double[][] getCurrentModelValue() {
-        return model.get(currentClassValue);
+        return getModel().get(currentClassValue);
     }
 
     public Double getCurrentClassValue() {
@@ -212,7 +179,7 @@ public class ContinuousBayesModel extends ClassificationMiningModel {
     }
 
     public int getClassLength(double key) {
-        return this.classLengths.get(key);
+        return getBayesElement().getClassLengths().get(key);
     }
 
     public void next() {
@@ -221,17 +188,5 @@ public class ContinuousBayesModel extends ClassificationMiningModel {
 
     public boolean hasNext() {
         return iterator.hasNext();
-    }
-
-    public int getLength() {
-        return length;
-    }
-
-    public int getAttrCount() {
-        return attrCount;
-    }
-
-    public void setAttrCount(int attrCount) {
-        this.attrCount = attrCount;
     }
 }
