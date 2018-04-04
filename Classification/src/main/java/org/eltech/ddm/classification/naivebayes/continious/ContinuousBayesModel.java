@@ -1,17 +1,16 @@
 package org.eltech.ddm.classification.naivebayes.continious;
 
 import org.eltech.ddm.classification.ClassificationMiningModel;
-import org.eltech.ddm.classification.naivebayes.category.TargetValueCount;
 import org.eltech.ddm.inputdata.MiningVector;
 import org.eltech.ddm.miningcore.MiningException;
 import org.eltech.ddm.miningcore.miningfunctionsettings.EMiningFunctionSettings;
-import org.eltech.ddm.miningcore.miningmodel.LogicalAttributeElement;
-import org.eltech.ddm.miningcore.miningmodel.LogicalAttributeValueElement;
 import org.eltech.ddm.miningcore.miningmodel.MiningModelElement;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.IntStream;
-import java.util.stream.Stream;
 
 /**
  * Represents model for Continues bayes Classifier algorithm.
