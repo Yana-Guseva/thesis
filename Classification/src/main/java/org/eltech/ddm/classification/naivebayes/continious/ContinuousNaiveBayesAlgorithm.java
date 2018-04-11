@@ -36,17 +36,19 @@ public class ContinuousNaiveBayesAlgorithm extends MiningAlgorithm {
 
     @Override
     public MiningSequence getCentralizedParallelAlgorithm() throws MiningException {
-        return getSequenceAlgorithm();
+        return getHorDistributedAlgorithm();
     }
 
     @Override
     public MiningSequence getHorDistributedAlgorithm() throws MiningException {
-        return new MiningSequence(miningSettings,
+        MiningSequence miningSequence = new MiningSequence(miningSettings,
                 new MiningParallel(miningSettings, MemoryType.distributed,
                         new MiningLoopVectors(miningSettings, new CalculateSumStep(miningSettings))),
                 new MiningParallel(miningSettings, MemoryType.distributed,
                         new FindMeanAndDeviationCycle(miningSettings, new FindMeanAndDeviationStep(miningSettings)))
         );
+        miningSequence.addListenerExecute(new BlockExecuteTimingListner());
+        return miningSequence;
     }
 
     @Override

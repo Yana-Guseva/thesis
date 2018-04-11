@@ -32,7 +32,6 @@ public class CalculateSumStep extends DataMiningBlock {
      * @param inputData - mining algorithm input data
      * @param model     - mining model
      * @return - mining model
-     * @throws MiningException - in case of unexpected situations
      */
     @Override
     public EMiningModel execute(MiningInputStream inputData, EMiningModel model) throws MiningException {

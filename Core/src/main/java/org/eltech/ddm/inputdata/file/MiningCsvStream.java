@@ -35,7 +35,7 @@ import java.util.stream.Stream;
  * @see com.univocity.parsers.common.processor.RowListProcessor
  * @see com.univocity.parsers.common.processor.ColumnProcessor
  */
-public class MiningCsvStream extends MiningFileStream {
+public class MiningCsvStream extends MiningFileStream implements ClonableStream {
 
     /*
      * Required fields for using parser
@@ -60,6 +60,23 @@ public class MiningCsvStream extends MiningFileStream {
     }
 
     /**
+     * Default constructor with configuration provider. If configuration is {@code null}
+     * the the default one will be used instead;
+     *
+     * @param file     - relative path to the data file
+     * @param settings - parser setting to apply
+     * @throws MiningException - in case of failure
+     */
+    public MiningCsvStream(String file,
+                           CsvParserSettings settings,
+                           ELogicalData logicalData,
+                           EPhysicalData physicalData) throws MiningException {
+        super(file, logicalData);
+        this.physicalData = physicalData;
+        this.settings = settings;
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override
@@ -71,6 +88,7 @@ public class MiningCsvStream extends MiningFileStream {
             MiningVector vector = new MiningVector(values);
             vector.setLogicalData(logicalData);
             vector.setIndex(++cursorPosition);
+            return vector;
         }
         return null;
 
@@ -187,6 +205,13 @@ public class MiningCsvStream extends MiningFileStream {
         return vectorsNumber;
     }
 
+    @Override
+    public MiningFileStream deepCopy() throws MiningException {
+        MiningCsvStream stream = new MiningCsvStream(this.fileName, this.settings, logicalData, physicalData);
+        stream.setVectorsNumber(this.vectorsNumber);
+        return stream;
+    }
+
     private static class RowCountProcessor extends AbstractRowProcessor {
         private int rowCount;
 
@@ -196,6 +221,10 @@ public class MiningCsvStream extends MiningFileStream {
                 rowCount++;
             }
         }
+    }
+
+    private void setVectorsNumber(int number) {
+        this.vectorsNumber = number;
     }
 
     @Override

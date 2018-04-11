@@ -3,8 +3,6 @@ package org.eltech.ddm.classification.naivebayes.continious;
 import com.univocity.parsers.csv.CsvParserSettings;
 import org.eltech.ddm.classification.ClassificationFunctionSettings;
 import org.eltech.ddm.environment.ConcurrencyExecutionEnvironment;
-import org.eltech.ddm.inputdata.MiningVector;
-import org.eltech.ddm.inputdata.file.MiningArffStream;
 import org.eltech.ddm.inputdata.file.MiningCsvStream;
 import org.eltech.ddm.miningcore.MiningException;
 import org.eltech.ddm.miningcore.algorithms.MiningAlgorithm;
@@ -15,6 +13,7 @@ import org.eltech.ddm.miningcore.miningtask.EMiningBuildTask;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.math.BigDecimal;
 import java.util.Comparator;
 import java.util.Map;
 
@@ -23,17 +22,23 @@ public class ContinuousNaiveBayesAlgorithmTest {
     private static final String ALGO_NAME = "NaiveBayesAlgorithm";
     private static final String ALGO_PATH = "org.eltech.ddm.classification.naivebayes.continious.ContinuousNaiveBayesAlgorithmTest";
 
+    private static final int HANDLERS_NUMBER = 1;
+
     protected MiningCsvStream inputData;
     private ClassificationFunctionSettings miningSettings;
 
 
-
     @Before
     public void setUp() throws Exception {
+        CsvParserSettings settings = getCsvParserSettings();
+        this.inputData = new MiningCsvStream("di.csv", settings);
+    }
+
+    private CsvParserSettings getCsvParserSettings() {
         CsvParserSettings settings = new CsvParserSettings();
         settings.setDelimiterDetectionEnabled(true);
         settings.setHeaderExtractionEnabled(true);
-        this.inputData = new MiningCsvStream("di.csv", settings);
+        return settings;
     }
 
 
@@ -46,7 +51,7 @@ public class ContinuousNaiveBayesAlgorithmTest {
 
     private EMiningBuildTask createBuidTask() throws MiningException {
         MiningAlgorithm algorithm = new ContinuousNaiveBayesAlgorithm(miningSettings);
-        ConcurrencyExecutionEnvironment environment = new ConcurrencyExecutionEnvironment(inputData);
+        ConcurrencyExecutionEnvironment environment = new ConcurrencyExecutionEnvironment(HANDLERS_NUMBER, inputData);
 
         EMiningBuildTask buildTask = new EMiningBuildTask();
         buildTask.setMiningAlgorithm(algorithm);
@@ -56,17 +61,17 @@ public class ContinuousNaiveBayesAlgorithmTest {
     }
 
     protected void verifyModel(ContinuousBayesModel model) throws MiningException {
-        MiningArffStream stream = new MiningArffStream("..\\data\\arff\\diabet-data.arff");
-        MiningVector current = stream.next();
-        while (current != null) {
-            Map<Double, Double> result = model.apply(current.getValues());
-            System.out.println(result);
-            System.out.println(predictions(result));
-            current = stream.next();
-        }
+//        MiningCsvStream stream = new MiningCsvStream("diabet-data.csv", getCsvParserSettings());
+//        MiningVector current = stream.next();
+//        while (current != null) {
+////            Map<Double, BigDecimal> result = model.apply(current.getValues());
+////            System.out.println(result);
+////            System.out.println(predictions(result));
+//            current = stream.next();
+//        }
     }
 
-    private Double predictions(Map<Double, Double> probabilityList) {
+    private Double predictions(Map<Double, BigDecimal> probabilityList) {
         return probabilityList.entrySet().stream().max(Comparator.comparing(Map.Entry::getValue)).get().getKey();
     }
 

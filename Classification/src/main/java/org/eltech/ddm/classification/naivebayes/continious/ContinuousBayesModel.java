@@ -6,6 +6,7 @@ import org.eltech.ddm.miningcore.MiningException;
 import org.eltech.ddm.miningcore.miningfunctionsettings.EMiningFunctionSettings;
 import org.eltech.ddm.miningcore.miningmodel.MiningModelElement;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -93,19 +94,21 @@ public class ContinuousBayesModel extends ClassificationMiningModel {
      * @param inputData - input data for algorithm
      * @return - result collection with the next structure {class-value} --> {probability}
      */
-    public Map<Double, Double> apply(double[] inputData) {
-        Map<Double, Double> probabilities = new HashMap<>();
+    public Map<Double, BigDecimal> apply(double[] inputData) {
+        Map<Double, BigDecimal> probabilities = new HashMap<>();
         BayesModelElement element = (BayesModelElement) sets.get(BAYES_INTUT_MODEL);
 
         element.getModel().keySet().forEach(key -> {
-            probabilities.put(key, 1D);
+            probabilities.put(key, BigDecimal.ONE);
             double[][] classAttributeList = element.getModel().get(key);
 
             for (int i = 0; i < classAttributeList.length; i++) {
                 double mean = classAttributeList[i][0];
                 double dev = classAttributeList[i][1];
-                double probability = probabilities.get(key) * attrProbability(inputData[i], mean, dev);
-                probabilities.put(key, probability);
+                if (mean > 0 && dev > 0) {
+                    BigDecimal probability = probabilities.get(key).multiply(BigDecimal.valueOf(attrProbability(inputData[i], mean, dev)));
+                    probabilities.put(key, probability);
+                }
             }
         });
 
@@ -146,21 +149,17 @@ public class ContinuousBayesModel extends ClassificationMiningModel {
      * @param values - values in fill in
      */
     private void fillArray(double key, double[][] data, double[] values) {
-        try {
-            IntStream.range(0, values.length).forEach(attr -> {
-                data[attr][0] += values[attr];
-                data[attr][1] += values[attr] * values[attr];
-            });
-            getModel().put(key, data);
-            Map<Double, Integer> classLengths = getBayesElement().getClassLengths();
-            Integer length = classLengths.get(key);
-            if (length == null) {
-                classLengths.put(key, 1);
-            } else {
-                classLengths.put(key, ++length);
-            }
-        } catch (Exception ex){
-            System.out.println("CATCHED");
+        IntStream.range(0, values.length).forEach(attr -> {
+            data[attr][0] += values[attr];
+            data[attr][1] += values[attr] * values[attr];
+        });
+        getModel().put(key, data);
+        Map<Double, Integer> classLengths = getBayesElement().getClassLengths();
+        Integer length = classLengths.get(key);
+        if (length == null) {
+            classLengths.put(key, 1);
+        } else {
+            classLengths.put(key, ++length);
         }
 
     }

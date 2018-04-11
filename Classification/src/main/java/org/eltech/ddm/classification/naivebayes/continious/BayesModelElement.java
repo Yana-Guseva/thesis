@@ -26,8 +26,6 @@ public class BayesModelElement extends MiningModelElement {
 
     @Override
     public void merge(List<MiningModelElement> elements) {
-
-
         List<BayesModelElement> bayesElements = elements.stream()
                 .map(BayesModelElement.class::cast)
                 .collect(Collectors.toList());
@@ -55,10 +53,10 @@ public class BayesModelElement extends MiningModelElement {
          */
         merged.keySet().forEach(key -> {
             double[][] reduced = merged.get(key).stream()
-                    .reduce(new double[2][attrCount], (initial, current) -> {
+                    .reduce(new double[attrCount][2], (initial, current) -> {
                         IntStream.range(0, current.length).forEach(index -> {
-                            initial[0][index] += current[0][index];
-                            initial[1][index] += current[1][index];
+                            initial[index][0] += current[index][0];
+                            initial[index][1] += current[index][1];
                         });
                         return initial;
                     });
