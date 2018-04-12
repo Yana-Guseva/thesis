@@ -46,31 +46,27 @@ public class ConcurrencyMiningExecutor extends MiningExecutor implements Cloneab
 		if (block == null)
 			throw new ParallelExecutionException("The executor has not a mining block");
 
-		future = service.submit(new Runnable(){
-			@Override
-			public void run() {
-				try {
-					resultModel = call(model);
-				} catch (MiningException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+		future = service.submit(() -> {
+			try {
+				resultModel = call(model);
+			} catch (MiningException e) {
+				e.printStackTrace();
 			}
-		} );
+		});
 	}
 
 	@Override
 	/**
 	 * Waiting finish of thread execution
 	 */
-	public EMiningModel getModel() throws ParallelExecutionException {
+	public EMiningModel getModel() {
 			while (!future.isDone()){};
 			return resultModel;
 	}
 
 
 	public Object clone() {
-		ConcurrencyMiningExecutor o = null;
+		ConcurrencyMiningExecutor o;
 		o = (ConcurrencyMiningExecutor) super.clone();
 		o.data = data;
 

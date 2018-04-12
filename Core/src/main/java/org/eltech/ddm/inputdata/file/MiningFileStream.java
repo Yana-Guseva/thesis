@@ -28,18 +28,18 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 package org.eltech.ddm.inputdata.file;
 
-import java.io.*;
-import java.util.*;
-
 import org.eltech.ddm.inputdata.MiningInputStream;
 import org.eltech.ddm.inputdata.MiningVector;
 import org.eltech.ddm.miningcore.MiningDataException;
 import org.eltech.ddm.miningcore.MiningErrorCode;
 import org.eltech.ddm.miningcore.MiningException;
-import org.eltech.ddm.miningcore.miningdata.EAttributeAssignmentSet;
 import org.eltech.ddm.miningcore.miningdata.ELogicalData;
 import org.eltech.ddm.miningcore.miningdata.EPhysicalData;
-import org.omg.java.cwm.analysis.transformation.TransformationMap;
+
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.Reader;
 
 /**
  * Mining input stream class for files.
@@ -73,9 +73,8 @@ public abstract class MiningFileStream extends MiningInputStream {
      *
      * @param file path of file to access
      * @param metaData meta data of file data
-     * @throws MiningException invalid file path
      */
-    public MiningFileStream(String file, ELogicalData logicalData) throws MiningException {
+    public MiningFileStream(String file, ELogicalData logicalData) {
         this();
         this.fileName = file;
         this.logicalData = logicalData;
@@ -90,7 +89,7 @@ public abstract class MiningFileStream extends MiningInputStream {
      * @param file path of file to access
      * @throws MiningException invalid file path
      */
-    public MiningFileStream(String file) throws MiningException {
+    public MiningFileStream(String file) {
         this(file, null);
     }
 

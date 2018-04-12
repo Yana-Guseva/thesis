@@ -27,25 +27,16 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 package org.eltech.ddm.inputdata.file;
 
-import java.io.*;
-import java.util.*;
-
-import javax.datamining.data.AttributeDataType;
-
 import org.eltech.ddm.inputdata.MiningSparseVector;
 import org.eltech.ddm.inputdata.MiningVector;
 import org.eltech.ddm.miningcore.MiningDataException;
 import org.eltech.ddm.miningcore.MiningException;
-import org.eltech.ddm.miningcore.miningdata.EAttributeAssignmentSet;
-import org.eltech.ddm.miningcore.miningdata.ECategoricalAttributeProperties;
-import org.eltech.ddm.miningcore.miningdata.EDirectAttributeAssignment;
-import org.eltech.ddm.miningcore.miningdata.ELogicalAttribute;
-import org.eltech.ddm.miningcore.miningdata.ELogicalData;
-import org.eltech.ddm.miningcore.miningdata.ENumericalAttributeProperties;
-import org.eltech.ddm.miningcore.miningdata.PhysicalAttribute;
-import org.eltech.ddm.miningcore.miningdata.EPhysicalData;
+import org.eltech.ddm.miningcore.miningdata.*;
 import org.omg.java.cwm.analysis.datamining.miningcore.miningdata.AttributeType;
 import org.omg.java.cwm.analysis.datamining.miningcore.miningdata.CategoryProperty;
+
+import javax.datamining.data.AttributeDataType;
+import java.io.*;
 
 
 

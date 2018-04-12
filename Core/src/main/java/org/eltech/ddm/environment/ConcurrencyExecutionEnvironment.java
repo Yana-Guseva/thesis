@@ -4,11 +4,9 @@ import org.eltech.ddm.handlers.MiningExecutorFactory;
 import org.eltech.ddm.handlers.ParallelExecutionException;
 import org.eltech.ddm.handlers.thread.ConcurrencyExecutorFactory;
 import org.eltech.ddm.inputdata.MiningInputStream;
-import org.eltech.ddm.inputdata.file.ClonableStream;
-import org.eltech.ddm.miningcore.MiningErrorCode;
+import org.eltech.ddm.inputdata.file.common.CloneableStream;
 import org.eltech.ddm.miningcore.MiningException;
 import org.eltech.ddm.miningcore.algorithms.*;
-import org.eltech.ddm.miningcore.miningmodel.EMiningModel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,8 +14,7 @@ import java.util.List;
 public class ConcurrencyExecutionEnvironment extends ExecutionEnvironment {
 
     private int numberThreads = 1;
-
-    private MiningInputStream data = null;
+    private MiningInputStream data;
 
     public ConcurrencyExecutionEnvironment(MiningInputStream data) throws MiningException {
         this.numberThreads = 1;
@@ -50,7 +47,7 @@ public class ConcurrencyExecutionEnvironment extends ExecutionEnvironment {
             startPos += countElement + mod;
             for (int i = 1; i < numberThreads; i++) {
                 mlv = new MiningLoopVectors(bl.getFunctionSettings(), startPos, countElement, (MiningSequence) bl.getIteration().clone());
-                executor = getMiningExecutorFactory().create(mlv, data instanceof ClonableStream ? ((ClonableStream) data).deepCopy() : data);
+                executor = getMiningExecutorFactory().create(mlv, data instanceof CloneableStream ? ((CloneableStream) data).deepCopy() : data);
                 execs.add(executor);
                 startPos += countElement;
             }

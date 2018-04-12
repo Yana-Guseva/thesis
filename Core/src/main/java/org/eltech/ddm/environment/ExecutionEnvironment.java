@@ -1,15 +1,14 @@
 package org.eltech.ddm.environment;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.eltech.ddm.handlers.MiningExecutorFactory;
 import org.eltech.ddm.handlers.ParallelExecutionException;
 import org.eltech.ddm.miningcore.MiningErrorCode;
 import org.eltech.ddm.miningcore.MiningException;
 import org.eltech.ddm.miningcore.algorithms.*;
-import org.eltech.ddm.miningcore.algorithms.MiningSequence;
 import org.eltech.ddm.miningcore.miningmodel.EMiningModel;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public abstract class ExecutionEnvironment {
     protected MiningExecutor mainExecutor = null;
