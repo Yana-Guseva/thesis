@@ -1,35 +1,51 @@
-package org.eltech.ddm.inputdata.file;
+package org.eltech.ddm.inputdata.file.csv;
 
 import com.univocity.parsers.common.AbstractWriter;
 import com.univocity.parsers.csv.CsvParser;
 import com.univocity.parsers.csv.CsvParserSettings;
 import com.univocity.parsers.csv.CsvWriter;
 import com.univocity.parsers.csv.CsvWriterSettings;
-import org.eltech.ddm.inputdata.MiningInputStream;
 import org.eltech.ddm.inputdata.file.common.FileSeparator;
+import org.eltech.ddm.miningcore.MiningException;
 
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
-public class CsvFileSeparator implements FileSeparator {
+/**
+ * Csv file separator. Separate input CSV files into several ones
+ *
+ * @author Evgenii Ray
+ */
+public class CsvFileSeparator implements FileSeparator<MiningCsvStream> {
+
+    private static final Logger LOGGER = Logger.getLogger(CsvFileSeparator.class.getName());
 
     private static final String CHUNK_TEMPLATE = "temp%d.csv";
     private CsvWriterSettings writerSettings = getDefaultWriterSettings();
 
     @Override
-    public List<MiningInputStream> separate(String filePath, int handlerNumber) throws FileNotFoundException {
-        CsvParserSettings settings = new CsvParserSettings();
-        settings.setDelimiterDetectionEnabled(true);
-        settings.setHeaderExtractionEnabled(true);
+    public List<MiningCsvStream> separate(String filePath, int handlerNumber) {
+        LOGGER.info("Initiating data separation...");
+        CsvParserSettings settings = MiningCsvStream.getDefaultSettings();
         CsvParser parser = new CsvParser(settings);
 
         List<DataOutputStream> list = new ArrayList<>(handlerNumber);
+        LOGGER.info("Number of files to create: " + handlerNumber);
 
         for (int i = 0; i < handlerNumber; i++) {
-            FileOutputStream fos = new FileOutputStream(String.format(CHUNK_TEMPLATE, i));
+            FileOutputStream fos = null;
+            try {
+                fos = new FileOutputStream(String.format(CHUNK_TEMPLATE, i));
+            } catch (FileNotFoundException e) {
+                LOGGER.log(Level.SEVERE, e, () -> "During file creation an exception occurred");
+            }
+            LOGGER.info(String.format("Temporary file: %s is created", String.format(CHUNK_TEMPLATE, i)));
             list.add(new DataOutputStream(new BufferedOutputStream(fos)));
         }
 
@@ -46,6 +62,7 @@ public class CsvFileSeparator implements FileSeparator {
         String[] row;
         Iterator<CsvWriter> iterator = streams.iterator();
 
+        LOGGER.info("Starting writing data to temporary files");
         parser = new CsvParser(settings);
         parser.beginParsing(getReader(filePath));
         while ((row = parser.parseNext()) != null) {
@@ -56,8 +73,17 @@ public class CsvFileSeparator implements FileSeparator {
         }
         parser.stopParsing();
         streams.forEach(AbstractWriter::close);
-
-        return null;
+        LOGGER.info("Data is successfully written");
+        return IntStream.range(0, handlerNumber)
+                .mapToObj(index -> {
+                    try {
+                        return new MiningCsvStream(String.format(CHUNK_TEMPLATE, index), null, true);
+                    } catch (MiningException e) {
+                        e.printStackTrace();
+                        return null;
+                    }
+                })
+                .collect(Collectors.toList());
     }
 
 
@@ -71,7 +97,12 @@ public class CsvFileSeparator implements FileSeparator {
     }
 
 
-    private CsvWriterSettings getDefaultWriterSettings() {
+    /**
+     * Provides default configuration for CSV writer
+     *
+     * @return - default config for writer
+     */
+    private static CsvWriterSettings getDefaultWriterSettings() {
         CsvWriterSettings settings = new CsvWriterSettings();
         settings.setNullValue("0");
         settings.setEmptyValue("0");
