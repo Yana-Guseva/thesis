@@ -29,6 +29,7 @@ public class ConcurentCSVExecutionEnvironment extends ExecutionEnvironment {
     private static final int START_POSITION = 0;
     private String mainDataFile;
     private FileSeparator<MiningCsvStream> separator = new CsvFileSeparator();
+    private static List<MiningCsvStream> streams = new ArrayList<>();
 
     /**
      * Main constructor for the environment
@@ -37,9 +38,12 @@ public class ConcurentCSVExecutionEnvironment extends ExecutionEnvironment {
      * @param threadNumber - count of threads to use
      * @throws ParallelExecutionException - in case of the parallel exec error
      */
-    public ConcurentCSVExecutionEnvironment(String file, int threadNumber) throws ParallelExecutionException {
+    public ConcurentCSVExecutionEnvironment(String file, int threadNumber) throws MiningException {
         this.mainDataFile = file;
         this.threadNumber = threadNumber;
+        streams = threadNumber == 1
+                ? Collections.singletonList(new MiningCsvStream(mainDataFile, null, false))
+                : separator.separate(mainDataFile, threadNumber);
         initEnvironment();
     }
 
@@ -57,9 +61,6 @@ public class ConcurentCSVExecutionEnvironment extends ExecutionEnvironment {
     @Override
     protected List<MiningExecutor> createExecutors(MiningBlock block) throws MiningException {
         List<MiningExecutor> execs = new ArrayList<>();
-        List<MiningCsvStream> streams = threadNumber == 1
-                ? Collections.singletonList(new MiningCsvStream(mainDataFile, null, false))
-                : separator.separate(mainDataFile, threadNumber);
         if (block instanceof MiningLoopVectors) {
             MiningLoopVectors bl = (MiningLoopVectors) block;
             for (int i = 0; i < threadNumber; i++) {
@@ -77,6 +78,12 @@ public class ConcurentCSVExecutionEnvironment extends ExecutionEnvironment {
             execs.add(executor);
         }
         return execs;
+    }
+
+    private List<MiningCsvStream> initStreams() throws MiningException {
+        return threadNumber == 1
+                ? Collections.singletonList(new MiningCsvStream(mainDataFile, null, false))
+                : separator.separate(mainDataFile, threadNumber);
     }
 
     /**

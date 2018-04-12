@@ -11,6 +11,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.IntStream;
 
 /**
@@ -27,6 +29,7 @@ import java.util.stream.IntStream;
  */
 public class ContinuousBayesModel extends ClassificationMiningModel {
 
+    private static final Logger LOGGER = Logger.getLogger(ContinuousBayesModel.class.getName());
     private final static int BAYES_INTUT_MODEL = 1;
 
     private Double currentClassValue;
@@ -136,9 +139,15 @@ public class ContinuousBayesModel extends ClassificationMiningModel {
      */
     public void putValue(double key, double[] values) {
         double[][] data = getModel().get(key) == null ? new double[values.length][2] : getModel().get(key);
-        fillArray(key, data, values);
-        getBayesElement().incrementLength();
-        getBayesElement().getClassValues().add(key);
+        try {
+            fillArray(key, data, values);
+            getBayesElement().incrementLength();
+            getBayesElement().getClassValues().add(key);
+        } catch (Exception ex) {
+            LOGGER.log(Level.SEVERE, ex, () -> "Exception occurred while parsing, but we intently just missing this record. " +
+                    "Check the input file, it might contains syntax error which parser can't solve on it's own. ");
+        }
+
     }
 
     /**

@@ -27,7 +27,7 @@ public class ContinuousNaiveBayesAlgorithmTest {
     private static final String ALGO_NAME = "NaiveBayesAlgorithm";
     private static final String ALGO_PATH = "org.eltech.ddm.classification.naivebayes.continious.ContinuousNaiveBayesAlgorithmTest";
 
-    private static final int HANDLERS_NUMBER = 4;
+    private static final int HANDLERS_NUMBER = 2;
 
     protected MiningCsvStream inputData;
     private ClassificationFunctionSettings miningSettings;
@@ -50,7 +50,7 @@ public class ContinuousNaiveBayesAlgorithmTest {
     @Test
     public void testSeparation() throws FileNotFoundException {
         FileSeparator<MiningCsvStream> separator = new CsvFileSeparator();
-        List<MiningCsvStream> separate = separator.separate("di.csv", 2);
+        List<MiningCsvStream> separate = separator.separate("diabet-data.csv", 2);
         Assert.assertEquals(separate.size(), 2);
     }
 
@@ -63,7 +63,7 @@ public class ContinuousNaiveBayesAlgorithmTest {
 
     private EMiningBuildTask createBuidTask() throws MiningException {
         MiningAlgorithm algorithm = new ContinuousNaiveBayesAlgorithm(miningSettings);
-        ConcurentCSVExecutionEnvironment environment = new ConcurentCSVExecutionEnvironment("di.csv", HANDLERS_NUMBER);
+        ConcurentCSVExecutionEnvironment environment = new ConcurentCSVExecutionEnvironment("diabet-data.csv", HANDLERS_NUMBER);
 
         EMiningBuildTask buildTask = new EMiningBuildTask();
         buildTask.setMiningAlgorithm(algorithm);

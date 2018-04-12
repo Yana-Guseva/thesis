@@ -8,6 +8,8 @@ import org.eltech.ddm.miningcore.miningfunctionsettings.EMiningFunctionSettings;
 import org.eltech.ddm.miningcore.miningmodel.EMiningModel;
 
 import java.util.Arrays;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Class represent logic for separating training sample by
@@ -16,6 +18,8 @@ import java.util.Arrays;
  * @author Evgenii Titkov
  */
 public class CalculateSumStep extends DataMiningBlock {
+
+    private static final Logger LOGGER = Logger.getLogger(CalculateSumStep.class.getName());
 
     /**
      * Constructor of algorithm's step for all or part of input data
@@ -35,10 +39,17 @@ public class CalculateSumStep extends DataMiningBlock {
      */
     @Override
     public EMiningModel execute(MiningInputStream inputData, EMiningModel model) throws MiningException {
-        ContinuousBayesModel algModel = (ContinuousBayesModel) model;
-        double[] values = inputData.getVector(model.getCurrentVectorIndex()).getValues();
-        algModel.putValue((int) values[values.length - 1], array(values));
-        return algModel;
+        try {
+            ContinuousBayesModel algModel = (ContinuousBayesModel) model;
+            double[] values = inputData.getVector(model.getCurrentVectorIndex()).getValues();
+            algModel.putValue((int) values[values.length - 1], array(values));
+            return algModel;
+        } catch (Exception ex) {
+            LOGGER.log(Level.SEVERE, ex, () -> "Exception occurred while parsing the record, but we intently just missing this record. " +
+                    "Check the input file, it might contains syntax error which parser can't solve on it's own. ");
+        }
+
+        return null;
     }
 
     /**
