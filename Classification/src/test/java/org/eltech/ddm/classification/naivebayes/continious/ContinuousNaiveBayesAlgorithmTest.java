@@ -2,7 +2,7 @@ package org.eltech.ddm.classification.naivebayes.continious;
 
 import com.univocity.parsers.csv.CsvParserSettings;
 import org.eltech.ddm.classification.ClassificationFunctionSettings;
-import org.eltech.ddm.environment.ConcurentCSVExecutionEnvironment;
+import org.eltech.ddm.environment.ConcurrentCSTExecutionEnvironment;
 import org.eltech.ddm.inputdata.file.common.FileSeparator;
 import org.eltech.ddm.inputdata.file.csv.CsvFileSeparator;
 import org.eltech.ddm.inputdata.file.csv.MiningCsvStream;
@@ -27,7 +27,9 @@ public class ContinuousNaiveBayesAlgorithmTest {
     private static final String ALGO_NAME = "NaiveBayesAlgorithm";
     private static final String ALGO_PATH = "org.eltech.ddm.classification.naivebayes.continious.ContinuousNaiveBayesAlgorithmTest";
 
-    private static final int HANDLERS_NUMBER = 2;
+    private static final String[] TEST_FILES = {"di_100mb.csv", "di_1gb.csv", "di_1.5gb.csv", "di_2gb.csv", "di_big.csv"};
+
+    private static final int HANDLERS_NUMBER = 8;
 
     protected MiningCsvStream inputData;
     private ClassificationFunctionSettings miningSettings;
@@ -36,7 +38,7 @@ public class ContinuousNaiveBayesAlgorithmTest {
     @Before
     public void setUp() throws Exception {
         CsvParserSettings settings = getCsvParserSettings();
-        this.inputData = new MiningCsvStream("di.csv", settings, false);
+        this.inputData = new MiningCsvStream("diabet-data.csv", settings, false);
     }
 
     private CsvParserSettings getCsvParserSettings() {
@@ -57,13 +59,16 @@ public class ContinuousNaiveBayesAlgorithmTest {
     @Test
     public void test() throws MiningException {
         createMiningSettings();
-        ContinuousBayesModel resultModel = (ContinuousBayesModel) createBuidTask().execute();
-        verifyModel(resultModel);
+        for (String fileName : TEST_FILES) {
+            ContinuousBayesModel resultModel = (ContinuousBayesModel) createBuidTask(fileName).execute();
+            verifyModel(resultModel);
+        }
+
     }
 
-    private EMiningBuildTask createBuidTask() throws MiningException {
+    private EMiningBuildTask createBuidTask(String targetFile) throws MiningException {
         MiningAlgorithm algorithm = new ContinuousNaiveBayesAlgorithm(miningSettings);
-        ConcurentCSVExecutionEnvironment environment = new ConcurentCSVExecutionEnvironment("diabet-data.csv", HANDLERS_NUMBER);
+        ConcurrentCSTExecutionEnvironment environment = new ConcurrentCSTExecutionEnvironment(targetFile, HANDLERS_NUMBER);
 
         EMiningBuildTask buildTask = new EMiningBuildTask();
         buildTask.setMiningAlgorithm(algorithm);

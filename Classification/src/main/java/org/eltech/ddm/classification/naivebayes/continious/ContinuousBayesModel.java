@@ -144,8 +144,9 @@ public class ContinuousBayesModel extends ClassificationMiningModel {
             getBayesElement().incrementLength();
             getBayesElement().getClassValues().add(key);
         } catch (Exception ex) {
-            LOGGER.log(Level.SEVERE, ex, () -> "Exception occurred while parsing, but we intently just missing this record. " +
+            LOGGER.log(Level.SEVERE, ex, () -> "Exception occurred while parsing, but we intently just missed this record. " +
                     "Check the input file, it might contains syntax error which parser can't solve on it's own. ");
+            LOGGER.info("Nothing to worry about, we continue the execution normally...)");
         }
 
     }
