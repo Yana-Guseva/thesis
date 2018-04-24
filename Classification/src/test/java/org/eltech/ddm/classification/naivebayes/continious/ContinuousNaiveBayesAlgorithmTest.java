@@ -27,7 +27,8 @@ public class ContinuousNaiveBayesAlgorithmTest {
     private static final String ALGO_NAME = "NaiveBayesAlgorithm";
     private static final String ALGO_PATH = "org.eltech.ddm.classification.naivebayes.continious.ContinuousNaiveBayesAlgorithmTest";
 
-    private static final String[] TEST_FILES = {"di_100mb.csv", "di_1gb.csv", "di_1.5gb.csv", "di_2gb.csv", "di_big.csv"};
+    private static final String[] TEST_FILES =
+            {"100mb.csv", "500mb.csv", "1000mb.csv", "1500mb.csv", "2000mb.csv", "2500mb.csv", "3000mb.csv"};
 
     private static final int HANDLERS_NUMBER = 8;
 
@@ -38,7 +39,7 @@ public class ContinuousNaiveBayesAlgorithmTest {
     @Before
     public void setUp() throws Exception {
         CsvParserSettings settings = getCsvParserSettings();
-        this.inputData = new MiningCsvStream("diabet-data.csv", settings, false);
+        this.inputData = new MiningCsvStream("pregnancy/short.csv", settings, false);
     }
 
     private CsvParserSettings getCsvParserSettings() {
@@ -60,7 +61,7 @@ public class ContinuousNaiveBayesAlgorithmTest {
     public void test() throws MiningException {
         createMiningSettings();
         for (String fileName : TEST_FILES) {
-            ContinuousBayesModel resultModel = (ContinuousBayesModel) createBuidTask(fileName).execute();
+            ContinuousBayesModel resultModel = (ContinuousBayesModel) createBuidTask("pregnancy/" + fileName).execute();
             verifyModel(resultModel);
         }
 
@@ -94,7 +95,7 @@ public class ContinuousNaiveBayesAlgorithmTest {
 
     private void createMiningSettings() throws MiningException {
         ELogicalData logicalData = inputData.getLogicalData();
-        ELogicalAttribute targetAttribute = logicalData.getAttribute("Outcome");
+        ELogicalAttribute targetAttribute = logicalData.getAttribute("outcome_pregnancy");
 
         EMiningAlgorithmSettings algorithmSettings = new EMiningAlgorithmSettings();
         algorithmSettings.setName(ALGO_NAME);
