@@ -1,8 +1,9 @@
 package org.eltech.ddm.environment;
 
-import org.eltech.ddm.MiningExecutorFactory;
-import org.eltech.ddm.ParallelExecutionException;
-import org.eltech.ddm.thread.ConcurrencyExecutorFactory;
+
+import org.eltech.ddm.handlers.MiningExecutorFactory;
+import org.eltech.ddm.handlers.ParallelExecutionException;
+import org.eltech.ddm.handlers.thread.ConcurrencyExecutorFactory;
 import org.eltech.ddm.inputdata.file.common.FileSeparator;
 import org.eltech.ddm.inputdata.file.csv.CsvFileSeparator;
 import org.eltech.ddm.inputdata.file.csv.MiningCsvStream;
