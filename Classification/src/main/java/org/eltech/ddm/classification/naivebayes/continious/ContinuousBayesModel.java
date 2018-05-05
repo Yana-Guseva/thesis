@@ -7,10 +7,7 @@ import org.eltech.ddm.miningcore.miningfunctionsettings.EMiningFunctionSettings;
 import org.eltech.ddm.miningcore.miningmodel.MiningModelElement;
 
 import java.math.BigDecimal;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.IntStream;
@@ -52,19 +49,21 @@ public class ContinuousBayesModel extends ClassificationMiningModel {
         BayesModelElement miningModelElement = (BayesModelElement) sets.get(BAYES_INTUT_MODEL);
         miningModelElement.setAttrCount(attrs.size());
         for (int i = 0; i < attrs.size(); i++) { // loop for attributes
-            MiningModelElement element = attrs.getElement(i);
-            String attrName = element.getID();
-            MiningModelElement attrElem = new MiningModelElement(attrName) {
-                @Override
-                protected String propertiesToString() {
-                    return "";
-                }
+            if (!target.getName().equals(attrs.getElement(i).getID())) {
+                MiningModelElement element = attrs.getElement(i);
+                String attrName = element.getID();
+                MiningModelElement attrElem = new MiningModelElement(attrName) {
+                    @Override
+                    protected String propertiesToString() {
+                        return "";
+                    }
 
-                @Override
-                public void merge(List<MiningModelElement> elements) {
-                }
-            };
-            addElement(index(BAYES_INTUT_MODEL), attrElem);
+                    @Override
+                    public void merge(List<MiningModelElement> elements) {
+                    }
+                };
+                addElement(index(BAYES_INTUT_MODEL), attrElem);
+            }
         }
 
     }
@@ -131,48 +130,54 @@ public class ContinuousBayesModel extends ClassificationMiningModel {
         return (BayesModelElement) sets.get(BAYES_INTUT_MODEL);
     }
 
-    /**
-     * Put method for a  model
-     *
-     * @param key    - key for a value
-     * @param values - value to store
-     */
-    public void putValue(double key, double[] values) {
+
+    public void putValue(int atrIndex, double[] values, double key) {
         double[][] data = getModel().get(key) == null ? new double[values.length][2] : getModel().get(key);
         try {
-            fillArray(key, data, values);
-            getBayesElement().incrementLength();
-            getBayesElement().getClassValues().add(key);
+            double atrValue = values[atrIndex];
+            data[atrIndex][0] += atrValue;
+            data[atrIndex][1] += atrValue * atrValue;
+            getModel().put(key, data);
+            if (atrIndex == values.length - 1) {
+                Map<Double, Integer> classLengths = getBayesElement().getClassLengths();
+                Integer length = classLengths.get(key);
+                if (length == null) {
+                    classLengths.put(key, 1);
+                } else {
+                    classLengths.put(key, ++length);
+                }
+                getBayesElement().incrementLength();
+                getBayesElement().getClassValues().add(key);
+            }
+
         } catch (Exception ex) {
-            LOGGER.log(Level.SEVERE, ex, () -> "Exception occurred while parsing, but we intently just missed this record. " +
-                    "Check the input file, it might contains syntax error which parser can't solve on it's own. ");
+            LOGGER.severe("Found corrupted record, program will ignore it");
             LOGGER.info("Nothing to worry about, we continue the execution normally...)");
         }
-
     }
 
-    /**
-     * Calculates sums which are required to calculate mean and dev in 1 pass
-     *
-     * @param key    - current class key
-     * @param data   - current array data
-     * @param values - values in fill in
-     */
-    private void fillArray(double key, double[][] data, double[] values) {
-        IntStream.range(0, values.length).forEach(attr -> {
-            data[attr][0] += values[attr];
-            data[attr][1] += values[attr] * values[attr];
-        });
-        getModel().put(key, data);
-        Map<Double, Integer> classLengths = getBayesElement().getClassLengths();
-        Integer length = classLengths.get(key);
-        if (length == null) {
-            classLengths.put(key, 1);
-        } else {
-            classLengths.put(key, ++length);
-        }
-
-    }
+//    /**
+//     * Calculates sums which are required to calculate mean and dev in 1 pass
+//     *
+//     * @param key    - current class key
+//     * @param data   - current array data
+//     * @param values - values in fill in
+//     */
+//    private void fillArray(double key, double[][] data, double[] values) {
+//        IntStream.range(0, values.length).forEach(attr -> {
+//            data[attr][0] += values[attr];
+//            data[attr][1] += values[attr] * values[attr];
+//        });
+//        getModel().put(key, data);
+//        Map<Double, Integer> classLengths = getBayesElement().getClassLengths();
+//        Integer length = classLengths.get(key);
+//        if (length == null) {
+//            classLengths.put(key, 1);
+//        } else {
+//            classLengths.put(key, ++length);
+//        }
+//
+//    }
 
     public void initIterator() {
         this.iterator = getBayesElement().getClassValues().iterator();
@@ -196,5 +201,11 @@ public class ContinuousBayesModel extends ClassificationMiningModel {
 
     public boolean hasNext() {
         return iterator.hasNext();
+    }
+
+    @Override
+    public boolean currIsLastElement(int[] indexSet) throws MiningException {
+        MiningModelElement elem = sets.get(BAYES_INTUT_MODEL);
+        return getCurrentAttributeIndex() >= elem.size();
     }
 }

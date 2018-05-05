@@ -19,19 +19,21 @@ public class ContinuousNaiveBayesAlgorithm extends MiningAlgorithm {
     /**
      * {@inheritDoc}
      */
-    ContinuousNaiveBayesAlgorithm(EMiningFunctionSettings miningSettings) throws MiningException {
+    public ContinuousNaiveBayesAlgorithm(EMiningFunctionSettings miningSettings) throws MiningException {
         super(miningSettings);
     }
 
 
     @Override
     public MiningSequence getSequenceAlgorithm() throws MiningException {
-        return new MiningSequence(miningSettings,
-                new MiningParallel(miningSettings, MemoryType.shared,
-                        new MiningLoopVectors(miningSettings, new CalculateSumStep(miningSettings))),
-                new MiningParallel(miningSettings, MemoryType.shared,
-                        new FindMeanAndDeviationCycle(miningSettings, new FindMeanAndDeviationStep(miningSettings)))
-        );
+        MiningSequence miningSequence = new MiningSequence(miningSettings,
+                new MiningParallel(miningSettings, MemoryType.distributed,
+                        new MiningLoopVectors(miningSettings,
+                                new MiningLoopElement(miningSettings, EMiningModel.INDEX_ATTRIBUTE_SET,
+                                        new CalculateSumStep(miningSettings)))),
+                new FindMeanAndDeviationCycle(miningSettings, new FindMeanAndDeviationStep(miningSettings)));
+        miningSequence.addListenerExecute(new BlockExecuteTimingListner());
+        return miningSequence;
     }
 
     @Override
@@ -43,10 +45,10 @@ public class ContinuousNaiveBayesAlgorithm extends MiningAlgorithm {
     public MiningSequence getHorDistributedAlgorithm() throws MiningException {
         MiningSequence miningSequence = new MiningSequence(miningSettings,
                 new MiningParallel(miningSettings, MemoryType.distributed,
-                        new MiningLoopVectors(miningSettings, new CalculateSumStep(miningSettings))),
-                new MiningParallel(miningSettings, MemoryType.distributed,
-                        new FindMeanAndDeviationCycle(miningSettings, new FindMeanAndDeviationStep(miningSettings)))
-        );
+                        new MiningLoopVectors(miningSettings,
+                                new MiningLoopElement(miningSettings, EMiningModel.INDEX_ATTRIBUTE_SET,
+                                        new CalculateSumStep(miningSettings)))),
+                new FindMeanAndDeviationCycle(miningSettings, new FindMeanAndDeviationStep(miningSettings)));
         miningSequence.addListenerExecute(new BlockExecuteTimingListner());
         return miningSequence;
     }

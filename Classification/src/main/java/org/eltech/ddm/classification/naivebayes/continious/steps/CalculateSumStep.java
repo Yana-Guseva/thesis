@@ -20,6 +20,7 @@ import java.util.logging.Logger;
 public class CalculateSumStep extends DataMiningBlock {
 
     private static final Logger LOGGER = Logger.getLogger(CalculateSumStep.class.getName());
+    private double[] currentVector;
 
     /**
      * Constructor of algorithm's step for all or part of input data
@@ -40,9 +41,11 @@ public class CalculateSumStep extends DataMiningBlock {
     @Override
     public EMiningModel execute(MiningInputStream inputData, EMiningModel model) throws MiningException {
         try {
+            if (model.getCurrentAttributeIndex() == 0) {
+                currentVector = inputData.getVector(model.getCurrentVectorIndex()).getValues();
+            }
             ContinuousBayesModel algModel = (ContinuousBayesModel) model;
-            double[] values = inputData.getVector(model.getCurrentVectorIndex()).getValues();
-            algModel.putValue((int) values[values.length - 1], array(values));
+            algModel.putValue(model.getCurrentAttributeIndex(), array(currentVector), currentVector[currentVector.length - 1]);
             return algModel;
         } catch (Exception ex) {
             LOGGER.log(Level.SEVERE, ex, () -> "Exception occurred while parsing the record, but we intently just missing this record. " +
