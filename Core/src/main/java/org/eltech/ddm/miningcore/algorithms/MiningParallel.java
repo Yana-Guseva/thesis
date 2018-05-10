@@ -35,6 +35,16 @@ public class MiningParallel extends MiningBlock {
         executors = new ArrayList<>();
      }
 
+//    public MiningParallel(EMiningFunctionSettings settings, MemoryType memory, MiningBlock block) throws MiningException {
+//        super(settings);
+//        memoryType = memory;
+//
+//        handlersNumber = algorithmSettings.getNumberHandlers();
+//        this.blocks = new MiningBlock[handlersNumber];
+//        this.blocks[0] = block;
+//        executors = new ArrayList<>();
+//    }
+
      @Override
     protected EMiningModel execute(EMiningModel model) throws MiningException {
 
@@ -49,14 +59,13 @@ public class MiningParallel extends MiningBlock {
             if(block instanceof MiningLoopElement) {
                 int[] index = ((MiningLoopElement) block).getIndexSet();
                 MiningModelElement elem = model.getElement(index);
-                int countElement = elem.size() / handlersNumber;
-                int mod = elem.size() % handlersNumber;
+                int countElement = elem.size() / executors.size();
+                int mod = elem.size() % executors.size();
                 handler.setBlock(new MiningLoopElement(functionSettings, index, startPos, countElement + mod, block.getIteration()));
                 startPos += countElement + mod;
-                for (int i = 1; i < handlersNumber; i++) {
-                    MiningExecutor h = (MiningExecutor)handler.clone();
+                for (int i = 1; i < executors.size(); i++) {
+                    MiningExecutor h = executors.get(i);
                     h.setBlock(new MiningLoopElement(functionSettings, index, startPos, countElement, block.getIteration()));
-                    executors.add(h);
                     startPos += countElement;
                 }
             }

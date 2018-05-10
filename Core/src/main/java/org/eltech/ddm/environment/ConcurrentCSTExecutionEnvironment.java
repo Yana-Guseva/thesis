@@ -9,6 +9,7 @@ import org.eltech.ddm.inputdata.file.csv.CsvFileSeparator;
 import org.eltech.ddm.inputdata.file.csv.MiningCsvStream;
 import org.eltech.ddm.miningcore.MiningException;
 import org.eltech.ddm.miningcore.algorithms.*;
+import org.eltech.ddm.miningcore.miningmodel.MiningModelElement;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -70,12 +71,17 @@ public class ConcurrentCSTExecutionEnvironment extends ExecutionEnvironment {
             MiningLoopVectors bl = (MiningLoopVectors) block;
             int summaryCount = 0;
             for (int i = 0; i < threadNumber; i++) {
-                summaryCount = +streams.get(i).getVectorsNumber();
+                summaryCount =+ streams.get(i).getVectorsNumber();
                 MiningLoopVectors mlv = new MiningLoopVectors(bl.getFunctionSettings(), START_POSITION, streams.get(i).getVectorsNumber(), (MiningSequence) bl.getIteration().clone());
                 MiningExecutor executor = getMiningExecutorFactory().create(mlv, streams.get(i));
                 execs.add(executor);
             }
             LOGGER.info("[Total Count of vectors to perform: " + summaryCount + " ]");
+        } else if (block instanceof MiningLoopElement) {
+            for (int i = 0; i < threadNumber; i++) {
+                MiningExecutor executor = getMiningExecutorFactory().create(block);
+                execs.add(executor);
+            }
         } else {
             MiningExecutor executor;
             if (block.isDataBlock()) {

@@ -1,67 +1,93 @@
 package org.eltech.ddm.associationrules;
 
+import org.eltech.ddm.miningcore.MiningException;
+import org.eltech.ddm.miningcore.miningmodel.MiningModelElement;
+
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.List;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
-public class TransactionList extends ArrayList<Transaction> {
-	private static final long serialVersionUID = 1L;
+public class TransactionList extends HashMapMiningModelElement {
+    private static final long serialVersionUID = 1L;
 
-	//private TransactionList root;
-	//private ItemSets inBetweenItemsets = new ItemSets();
+    public TransactionList(String id) {
+        super(id);
+    }
 
-	public TransactionList() {
+    public boolean containsTransaction(String tid) {
+        for (MiningModelElement transaction : super.set) {
+            if (transaction.getID().equals(tid)) {
+                return true;
+            }
+        }
+        return false;
+    }
 
-	}
+    public Transaction getTransaction(int index) {
+        if (size() > index)
+            return (Transaction) super.set.get(index);
+        else
+            return null;
+    }
 
-	public TransactionList(Collection<Transaction> collection) {
-		super(collection);
-	}
+//    public Transaction getTransaction(String tid) {
+//        for (MiningModelElement transaction : super.set) {
+//            if (transaction.getID().equals(tid)) {
+//                return (Transaction) transaction;
+//            }
+//        }
+//        return null;
+//    }
 
-//	public TransactionList getRoot() {
-//		return root;
-//	}
+    @Override
+    protected String propertiesToString() {
+        return null;
+    }
+
+    @Override
+    public void merge(List<MiningModelElement> elements) throws MiningException {
+//        elements.forEach(element -> ((HashMapMiningModelElement) element).getSet()
+//                .forEach(transaction -> {
+//                            if (!this.containsKey(transaction.getID())) {
+//                                add(transaction);
+//                            } else {
+//                                Transaction curTransaction = (Transaction) getElement(transaction.getID());
+//                                Transaction t = (Transaction) transaction;
+//                                t.getItemIDList()
+//                                        .forEach(id -> {
+//                                            if (!curTransaction.getItemIDList().contains(id)) {
+//                                                curTransaction.addItem((Item) t.getElement(id));
+//                                            }
+//                                        });
+//                            }
+//                        }
 //
-//	public void setRoot(TransactionList root) {
-//		this.root = root;
-//	}
-//
-//	public ItemSets getInBetweenItemsets() {
-//		return inBetweenItemsets;
-//	}
-//
-//	public void setInBetweenItemsets(ItemSets inBetweenItemsets) {
-//		this.inBetweenItemsets = inBetweenItemsets;
-//	}
+//                ));
 
-	public void print() {
-		System.out.println("TID | Items");
-		for(Transaction transaction : this) {
-			System.out.println("  " + transaction.getTID() + " | " + transaction.getItemIDList());
-		}
-	}
+                elements.forEach(element -> ((HashMapMiningModelElement) element).getSet()
+                .forEach(transaction -> {
+                            if (!this.containsKey(transaction.getID())) {
+                                add(transaction);
+                            } else {
+                                Transaction curTransaction = (Transaction) getElement(transaction.getID());
+                                Transaction t = (Transaction) transaction;
+                                t.getItemIDList()
+                                        .forEach(id -> {
+                                            if (!curTransaction.getItemIDList().contains(id)) {
+                                                curTransaction.addItem((Item) t.getElement(id));
+                                            }
+                                        });
+                            }
+                        }
 
-	public boolean containsTransaction(String tid) {
-		for(Transaction transaction : this) {
-			if(transaction.getTID().equals(tid)) {
-				return true;
-			}
-		}
-		return false;
-	}
+                ));
 
-	public Transaction getTransaction(int index) {
-		if(size() > index)
-			return get(index);
-		else
-			return null;
-	}
 
-	public Transaction getTransaction(String tid) {
-		for(Transaction transaction : this) {
-			if(transaction.getTID().equals(tid)) {
-				return transaction;
-			}
-		}
-		return null;
-	}
+
+//        elements.forEach(element -> ((HashMapMiningModelElement) element).getSet()
+//                .stream()
+//                .filter(e -> !this.containsKey(e.getID()))
+//                .forEach(this::add));
+    }
 }

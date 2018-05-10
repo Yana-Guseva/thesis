@@ -46,7 +46,7 @@ public class MiningLoopVectors extends MiningLoop {
 	protected boolean conditionLoop(EMiningModel model) throws MiningException {
 		if(countElement < 0)
     		throw new MiningException(MiningErrorCode.INVALID_INPUT_DATA);
-			//return (model.getCurrentVectorIndex() < data.getVectorsNumber());
+//			return (model.getCurrentVectorIndex() < data.getVectorsNumber());
 		else {
 			return ((model.getCurrentVectorIndex() - startPositon) < countElement);
 		}

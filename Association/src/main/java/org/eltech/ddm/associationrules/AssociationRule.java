@@ -1,6 +1,11 @@
 package org.eltech.ddm.associationrules;
 
-public class AssociationRule implements Cloneable{
+import org.eltech.ddm.miningcore.MiningException;
+import org.eltech.ddm.miningcore.miningmodel.MiningModelElement;
+
+import java.util.List;
+
+public class AssociationRule extends MiningModelElement implements Cloneable{
 
 	public ItemSet antecedent;
 	public ItemSet consequent;
@@ -8,11 +13,9 @@ public class AssociationRule implements Cloneable{
 	private double support;
 	private double confidence;
 
-	public AssociationRule() {
-	}
-
 	public AssociationRule(ItemSet antecedent, ItemSet consequent, double support,
 			double confidence) {
+		super(antecedent.getItemIDList()+ " => " + consequent.getItemIDList());
 		this.antecedent = antecedent;
 		this.consequent = consequent;
 //		length = antecedent.getItems().size() + consequent.getItems().size();
@@ -61,16 +64,21 @@ public class AssociationRule implements Cloneable{
 		return false;
 	}
 
-	public Object clone() {
-		AssociationRule o = new AssociationRule();
+//	public Object clone() {
+//		AssociationRule o = new AssociationRule();
+//
+//		o.antecedent = (ItemSet) antecedent.clone();
+//		o.consequent = (ItemSet)consequent.clone();
+////		o.length = length;
+//		o.support = support;
+//		o.confidence = confidence;
+//
+//		return o;
+//	}
 
-		o.antecedent = (ItemSet) antecedent.clone();
-		o.consequent = (ItemSet)consequent.clone();
-//		o.length = length;
-		o.support = support;
-		o.confidence = confidence;
-
-		return o;
+	@Override
+	protected String propertiesToString() {
+		return "";
 	}
 
 	@Override
@@ -84,5 +92,10 @@ public class AssociationRule implements Cloneable{
 			.append(", confidence = ")
 			.append(confidence);
 		return  b.toString();
+	}
+
+	@Override
+	public void merge(List<MiningModelElement> elements) throws MiningException {
+
 	}
 }

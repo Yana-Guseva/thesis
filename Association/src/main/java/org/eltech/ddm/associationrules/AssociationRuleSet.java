@@ -1,18 +1,20 @@
 package org.eltech.ddm.associationrules;
 
-import java.util.ArrayList;
+import org.eltech.ddm.miningcore.MiningException;
+import org.eltech.ddm.miningcore.miningmodel.MiningModelElement;
 
-public class AssociationRuleSet extends ArrayList<AssociationRule> {
+import java.util.List;
+
+public class AssociationRuleSet extends MiningModelElement {
 	private static final long serialVersionUID = 1L;
 
-	public AssociationRuleSet() {
-		super();
+	public AssociationRuleSet(String id) {
+		super(id);
 	}
 	
-	@Override
     public boolean contains(Object o) {
     	boolean contain = false;
-    	for(AssociationRule rule : this) {
+    	for(MiningModelElement rule : super.set) {
     		if(rule.equals(o)) {
     			contain = true;
     			break;
@@ -22,12 +24,22 @@ public class AssociationRuleSet extends ArrayList<AssociationRule> {
     	}
     	return contain;
     }
-	
+
+	@Override
+	protected String propertiesToString() {
+		return "";
+	}
+
 	public String toString() {
 		StringBuilder b = new StringBuilder();
-		for (AssociationRule rule : this) {
+		for (MiningModelElement rule : super.set) {
 	        b.append(rule).append("\n");
 		}
 		return b.toString();
+	}
+
+	@Override
+	public void merge(List<MiningModelElement> elements) throws MiningException {
+
 	}
 }

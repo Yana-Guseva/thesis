@@ -4,77 +4,70 @@ import org.eltech.ddm.associationrules.AssociationRulesFunctionSettings;
 import org.eltech.ddm.associationrules.AssociationRulesMiningModel;
 import org.eltech.ddm.associationrules.Item;
 import org.eltech.ddm.associationrules.Transaction;
-import org.eltech.ddm.associationrules.TransactionList;
 import org.eltech.ddm.inputdata.MiningInputStream;
 import org.eltech.ddm.inputdata.MiningVector;
 import org.eltech.ddm.miningcore.MiningException;
-import org.eltech.ddm.miningcore.algorithms.Step;
+import org.eltech.ddm.miningcore.algorithms.DataMiningBlock;
 import org.eltech.ddm.miningcore.miningfunctionsettings.EMiningFunctionSettings;
 import org.eltech.ddm.miningcore.miningmodel.EMiningModel;
+import org.eltech.ddm.miningcore.miningmodel.MiningModelElement;
 
-public class BuildTransactionStep extends Step {
+import static org.eltech.ddm.miningcore.miningmodel.EMiningModel.index;
 
-	protected final String itemIDsAttributeName;
-	protected final String transactionIDsAttributeName;
+public class BuildTransactionStep extends DataMiningBlock {
 
-	public BuildTransactionStep(EMiningFunctionSettings settings) throws MiningException {
-		super(settings);
+    private final String itemIDsAttributeName;
+    private final String transactionIDsAttributeName;
 
-		itemIDsAttributeName = ((AssociationRulesFunctionSettings) settings).getLogicalData()
-				.getAttribute(((AssociationRulesFunctionSettings) settings).getItemIDsAttributeName()).getName();
-		transactionIDsAttributeName = ((AssociationRulesFunctionSettings) settings).getLogicalData()
-				.getAttribute(((AssociationRulesFunctionSettings) settings).getTransactionIDsAttributeName()).getName();
+    /**
+     * Constructor of algorithm's calculation step (not using data set)
+     *
+     * @param settings - settings for build model
+     */
+    public BuildTransactionStep(EMiningFunctionSettings settings) throws MiningException {
+        super(settings);
 
-	}
+        itemIDsAttributeName = ((AssociationRulesFunctionSettings) settings).getItemIDsAttributeName();
+        transactionIDsAttributeName = ((AssociationRulesFunctionSettings) settings).getTransactionIDsAttributeName();
+    }
+
+    @Override
+    protected EMiningModel execute(MiningInputStream data, EMiningModel model) throws MiningException {
+        AssociationRulesMiningModel modelA = (AssociationRulesMiningModel) model;
+
+        MiningVector mv = data.getVector(model.getCurrentVectorIndex());
+        String transId = String.valueOf(mv.getValue(transactionIDsAttributeName));
+        String itemId = String.valueOf(mv.getValue(itemIDsAttributeName));
 
 
-	@Override
-	protected EMiningModel execute(MiningInputStream inputData, EMiningModel model ) throws MiningException {
+        Item item = (Item) createItem(itemId, modelA);
+        Transaction transaction = createTransaction(transId, item, modelA);
+//        System.out.println(Thread.currentThread().getName() + " " + transId + " " + itemId);
 
-		AssociationRulesMiningModel modelA = (AssociationRulesMiningModel) model;
-		
-		int currentVector = model.getCurrentVectorIndex(); //(Integer)getStateParameter(model, EMiningModel.NAME_CURRENT_VECTOR);
-		MiningVector vector = inputData.getVector(currentVector);
-		String transId = (String) vector.getValueCategory(transactionIDsAttributeName).getValue();
-		String itemId = (String) vector.getValueCategory(itemIDsAttributeName).getValue();
+        return model;
+    }
 
-		//System.out.println("Thread: " + Thread.currentThread().getName() + " transaction=" + transId + " item=" + itemId);
+    protected Transaction createTransaction(String transId, Item item, AssociationRulesMiningModel model) throws MiningException {
+        Transaction transaction = model.getTransaction(transId);
+        if (transaction == null) {
+            transaction = new Transaction(transId);
+            model.addElement(index(AssociationRulesMiningModel.TRANSACTION_LIST_SET), transaction);
+        }
 
-		Item item = createItem(itemId, modelA);
-		Transaction transaction = createTransaction(transId, item, modelA);
-		
-		return modelA;
-	}
-	
-	protected Transaction createTransaction(String transId, Item item, AssociationRulesMiningModel modelA){
-		TransactionList transactions = modelA.getTransactionList();
-		Transaction transaction = null;
-		if (transactions.containsTransaction(transId)) {
-			transaction = transactions.getTransaction(transId);
-		} else {
-			transaction = new Transaction();
-			transaction.setTID(transId);
-			transactions.add(transaction);
-		}
-		int currentTransaction = transactions.indexOf(transaction);
-		modelA.setCurrentTransaction(currentTransaction);
-		//setStateParameter(modelA, AssociationRulesMiningModel.NAME_CURRENT_TRANSACTION, currentTransaction);
+        if (!transaction.getItemIDList().contains(item.getItemID())) { // transaction has not duplicated items
+            transaction.addItem(item);
+        }
 
-		if(!transaction.getItemIDList().contains(item.getItemID())) // transaction has not duplicated items
-			transaction.getItemIDList().add(item.getItemID());
+        return transaction;
+    }
 
-		return transaction;
-	}
-	
-	protected Item createItem(String itemId, AssociationRulesMiningModel modelA){
-		Item item = modelA.getItem(itemId);
-		if (item == null) {
-			item = new Item(itemId);
-			modelA.addItem(item);
-		}	
-		
-		return item;
-	}
-
+    protected MiningModelElement createItem(String itemId, AssociationRulesMiningModel model) throws MiningException {
+        Item item = model.getItem(itemId);
+        if (item == null) {
+            item = new Item(itemId);
+            model.addElement(index(AssociationRulesMiningModel.ITEM_SET), item);
+        }
+        return item;
+    }
 
 }

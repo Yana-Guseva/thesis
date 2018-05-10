@@ -39,6 +39,19 @@ public class EMiningAlgorithmSettings extends MiningAlgorithmSettings implements
 	private String version;
 
 	/**
+	 * This is number of computing processors (handlers) on which the parallel algorithm will be executed
+	 */
+	protected int numberHandlers = 1;
+
+	public int getNumberHandlers() {
+		return numberHandlers;
+	}
+
+	public void setNumberHandlers(int numberHandlers) {
+		this.numberHandlers = numberHandlers;
+	}
+
+	/**
 	 * Verifies if the settings are valid to some degree of correctness as specified by the vendor.
 	 * Returns null if the settings object is valid. If the settings object is invalid, it returns
 	 * an instance of VerificationReport, which contains a vendor specific explanation.

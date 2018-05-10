@@ -68,6 +68,17 @@ abstract public class MiningModelElement implements Cloneable { // , Iterable<Mi
         return set.get(index);
     }
 
+    public MiningModelElement getElement(String id) {
+        if (set != null) {
+            for (MiningModelElement elem : set) {
+                if (id.equals(elem.getID())) {
+                    return elem;
+                }
+            }
+        }
+        return null;
+    }
+
     protected synchronized void add(MiningModelElement element){
         if (set == null)
             set = new ArrayList<>();
@@ -152,7 +163,7 @@ abstract public class MiningModelElement implements Cloneable { // , Iterable<Mi
      * @param elems - sets of mining models which are built by parallel functions
      * @throws MiningException
      */
-    void union(List<MiningModelElement> elems) throws MiningException {
+    public void union(List<MiningModelElement> elems) throws MiningException {
         // 1 merge all properties of this mining element
         merge(elems);
 
@@ -186,7 +197,7 @@ abstract public class MiningModelElement implements Cloneable { // , Iterable<Mi
             lists.remove(ent.getID());
             if(list == null || (list.size() < (elems.size() - includingSelf))) { // if element was deleted by parallel function
                 // save removed element
-                remElem.add(ent);
+//                remElem.add(ent);
             }
             else {// if element was changed (may be)
                 ent.union(list);
