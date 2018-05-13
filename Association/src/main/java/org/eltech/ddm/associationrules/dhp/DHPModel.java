@@ -2,6 +2,8 @@ package org.eltech.ddm.associationrules.dhp;
 
 import org.eltech.ddm.associationrules.AssociationRulesFunctionSettings;
 import org.eltech.ddm.associationrules.HashMapMiningModelElement;
+import org.eltech.ddm.associationrules.HashTable;
+import org.eltech.ddm.associationrules.HashTableList;
 import org.eltech.ddm.associationrules.apriori.AprioriMiningModel;
 import org.eltech.ddm.miningcore.MiningException;
 import org.eltech.ddm.miningcore.miningmodel.MiningModelElement;
@@ -22,18 +24,7 @@ public class DHPModel extends AprioriMiningModel implements Cloneable {
 
     public DHPModel(AssociationRulesFunctionSettings settings) throws MiningException {
         super(settings);
-
-        sets.add(HASH_TABLE_SET, new MiningModelElement("hashTableSet") {
-            @Override
-            protected String propertiesToString() {
-                return "";
-            }
-
-            @Override
-            public void merge(List<MiningModelElement> elements) throws MiningException {
-
-            }
-        });
+        sets.add(HASH_TABLE_SET, new HashTableList("hashTableSet"));
     }
 
     @Override
@@ -41,9 +32,9 @@ public class DHPModel extends AprioriMiningModel implements Cloneable {
 
     }
 
-    public HashMapMiningModelElement getHashTable(int index) throws MiningException {
-        return (HashMapMiningModelElement) getElement(index(DHPModel.HASH_TABLE_SET, index));
-    }
+//    public HashMapMiningModelElement getHashTable(int index) throws MiningException {
+//        return (HashMapMiningModelElement) getElement(index(DHPModel.HASH_TABLE_SET, index));
+//    }
 
     @Override
     public MiningModelElement nextCurrElement(int[] indexSet) throws MiningException {
@@ -91,5 +82,9 @@ public class DHPModel extends AprioriMiningModel implements Cloneable {
 
     public void setTransactionPruned(boolean isTransactionPruned) {
         this.isTransactionPruned = isTransactionPruned;
+    }
+
+    public HashMapMiningModelElement getHashTable(int index) throws MiningException {
+        return (HashMapMiningModelElement) getElement(index(DHPModel.HASH_TABLE_SET, index));
     }
 }

@@ -25,7 +25,7 @@ public class Calculate1ItemSetSupportStep extends MiningBlock {
 		int transIndex = modelA.getCurrentTransactionIndex();
 		int itemIndex = modelA.getCurrentItemIndex();
         Item item = modelA.getItem(transIndex, itemIndex);
-        item.setSupportCount(item.getSupportCount() + 1);
+        item.incSupportCount();
 
 		return modelA;
 	}

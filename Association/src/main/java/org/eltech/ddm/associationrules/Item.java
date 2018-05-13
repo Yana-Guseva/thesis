@@ -6,6 +6,8 @@ import org.eltech.ddm.miningcore.miningmodel.MiningModelElement;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.eltech.ddm.miningcore.miningmodel.EMiningModel.index;
+
 public class Item extends MiningModelElement implements Comparable<Item> {
     private String itemID;
     private List<String> tidList = new ArrayList<>();
@@ -56,7 +58,7 @@ public class Item extends MiningModelElement implements Comparable<Item> {
         return supportCount;
     }
 
-    public void setSupportCount(int supportCount) {
+    public synchronized void setSupportCount(int supportCount) {
         this.supportCount = supportCount;
     }
 
@@ -83,5 +85,15 @@ public class Item extends MiningModelElement implements Comparable<Item> {
         return "itemId " + itemID;
     }
 
+    public synchronized void incSupportCount() {
+        this.supportCount += 1;
+    }
 
+    public synchronized void calcSupport(int transactionCount, double minSupport, HashTable hashTable) {
+        double supp = ((double) this.supportCount) / transactionCount;
+        if (supp >= minSupport) {
+            ItemSet itemSet = (ItemSet) hashTable.createOrGetElement(this);
+            itemSet.setSupportCount(this.supportCount);
+        }
+    }
 }

@@ -96,4 +96,17 @@ public class ItemSet extends HashMapMiningModelElement {
     protected String propertiesToString() {
         return null;
     }
+
+    public synchronized MiningModelElement createOrGetElement(String id) {
+        MiningModelElement element = getElement(id);
+        if (element == null) {
+            element = new Item(id);
+            add(element);
+        }
+        return element;
+    }
+
+    public synchronized void incSupportCount() {
+        supportCount += 1;
+    }
 }

@@ -12,7 +12,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 public class DHPAlgorithmParallelTest extends DHPModelTest {
-    private final int NUMBER_HANDLERS = 1;
+    private final int NUMBER_HANDLERS = 4;
     private static final String ALGO_NAME = "DHPAlgorithm";
     private static final String ALGO_PATH = "org.eltech.ddm.associationrules.dhp.DHPAlgorithm";
     protected EMiningAlgorithmSettings algorithmSettings;
@@ -28,7 +28,8 @@ public class DHPAlgorithmParallelTest extends DHPModelTest {
     @Test
     public void test() throws Exception {
         setMiningSettings(algorithmSettings);
-        EMiningBuildTask buildTask = createBuildTask("transactions_400.csv");
+        EMiningBuildTask buildTask = createBuildTask("transactions_1Gb.csv");
+//        EMiningBuildTask buildTask = createBuildTask("T_200.csv");
         model = (DHPModel) buildTask.execute();
 
         verifyModel();

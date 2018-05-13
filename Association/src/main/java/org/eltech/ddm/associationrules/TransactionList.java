@@ -47,24 +47,6 @@ public class TransactionList extends HashMapMiningModelElement {
 
     @Override
     public void merge(List<MiningModelElement> elements) throws MiningException {
-//        elements.forEach(element -> ((HashMapMiningModelElement) element).getSet()
-//                .forEach(transaction -> {
-//                            if (!this.containsKey(transaction.getID())) {
-//                                add(transaction);
-//                            } else {
-//                                Transaction curTransaction = (Transaction) getElement(transaction.getID());
-//                                Transaction t = (Transaction) transaction;
-//                                t.getItemIDList()
-//                                        .forEach(id -> {
-//                                            if (!curTransaction.getItemIDList().contains(id)) {
-//                                                curTransaction.addItem((Item) t.getElement(id));
-//                                            }
-//                                        });
-//                            }
-//                        }
-//
-//                ));
-
                 elements.forEach(element -> ((HashMapMiningModelElement) element).getSet()
                 .forEach(transaction -> {
                             if (!this.containsKey(transaction.getID())) {
@@ -83,11 +65,18 @@ public class TransactionList extends HashMapMiningModelElement {
 
                 ));
 
-
-
 //        elements.forEach(element -> ((HashMapMiningModelElement) element).getSet()
 //                .stream()
 //                .filter(e -> !this.containsKey(e.getID()))
 //                .forEach(this::add));
+    }
+
+    public synchronized MiningModelElement createOrGetElement(String id) {
+        MiningModelElement element = getElement(id);
+        if (element == null) {
+            element = new Transaction(id);
+            add(element);
+        }
+        return element;
     }
 }

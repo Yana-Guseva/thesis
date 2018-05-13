@@ -56,35 +56,44 @@ public class DHPAlgorithm extends MiningAlgorithm {
 
     @Override
     public MiningSequence getHorDistributedAlgorithm() throws MiningException {
-        MiningSequence blocks = new MiningSequence(miningSettings,
-                new MiningParallel(miningSettings, MemoryType.distributed,
-                        new MiningLoopVectors(miningSettings,
-                                new BuildTransactionStep(miningSettings))
-                        ),
-                new SetTransactionCountStep(miningSettings),
-//                new MiningParallel(miningSettings, MemoryType.distributed,
-                new MiningLoopElement(miningSettings, index(AssociationRulesMiningModel.INDEX_TRANSACTION_LIST_SET),
-                        new MiningLoopElement(miningSettings, index(AssociationRulesMiningModel.INDEX_CURRENT_TRANSACTION_ITEM),
-                                new Calculate1ItemSetSupportStep(miningSettings),
-                                new CreateLarge1ItemSetStep(miningSettings))),
-                new MiningParallel(miningSettings, MemoryType.distributed,
+        MiningSequence buildBlock = new MiningSequence(miningSettings, new MiningParallel(miningSettings, MemoryType.shared,
+                new MiningLoopVectors(miningSettings,
+                        new BuildTransactionStep(miningSettings))), new SetTransactionCountStep(miningSettings));
+        buildBlock.addListenerExecute(new BlockExecuteTimingListner());
+
+        MiningSequence createLarge1ItemSetBlock = new MiningSequence(miningSettings,
+//                new MiningParallel(miningSettings, MemoryType.shared,
                         new MiningLoopElement(miningSettings, index(AssociationRulesMiningModel.INDEX_TRANSACTION_LIST_SET),
-                                new CreateHashTable(miningSettings))
-        ),
-                new LargeItemSetListsCycleStep(miningSettings,
-                        new PruningStep(miningSettings),
-//                        new MiningParallel(miningSettings, MemoryType.distributed,
-                                new MiningLoopElement(miningSettings, index(AssociationRulesMiningModel.INDEX_TRANSACTION_LIST_SET),
-                                        new CreateHashTable(miningSettings))),
-//        ),
-//                                new MiningParallel(miningSettings, MemoryType.distributed,
-//                                        new MiningLoopElement(miningSettings, index(AssociationRulesMiningModel.INDEX_TRANSACTION_LIST_SET),
-//                                        new PruneTransactionListStep(miningSettings),
-//                                        new IsThereCurrentTransaction(miningSettings, new CreateHashTable(miningSettings))))),
-                new LargeItemSetListsCycleStep(miningSettings, 1,
-                        new KLargeItemSetsCycleStep(miningSettings, index(DHPModel.INDEX_CURRENT_LARGE_ITEM_SET),
-                                new LargeItemSetItemsCycleStep(miningSettings, index(DHPModel.INDEX_CURRENT_ITEM_LARGE_ITEM_SET),
-                                        new GenerateAssosiationRuleStep(miningSettings)))));
+                                new MiningLoopElement(miningSettings, index(AssociationRulesMiningModel.INDEX_CURRENT_TRANSACTION_ITEM),
+                                        new Calculate1ItemSetSupportStep(miningSettings),
+                                        new CreateLarge1ItemSetStep(miningSettings))));
+        createLarge1ItemSetBlock.addListenerExecute(new BlockExecuteTimingListner());
+
+        MiningSequence createFirstHashTable = new MiningSequence(miningSettings,
+                new MiningParallel(miningSettings, MemoryType.shared,
+                        new MiningLoopElement(miningSettings, index(AssociationRulesMiningModel.INDEX_TRANSACTION_LIST_SET),
+                                new CreateHashTable(miningSettings))));
+        createFirstHashTable.addListenerExecute(new BlockExecuteTimingListner());
+
+        MiningSequence createHashTables = new MiningSequence(miningSettings, new LargeItemSetListsCycleStep(miningSettings,
+                new PruningStep(miningSettings),
+                new MiningParallel(miningSettings, MemoryType.shared,
+                        new MiningLoopElement(miningSettings, index(AssociationRulesMiningModel.INDEX_TRANSACTION_LIST_SET),
+                                new CreateHashTable(miningSettings)))));
+        createHashTables.addListenerExecute(new BlockExecuteTimingListner());
+
+        MiningSequence generateRules = new MiningSequence(miningSettings, new LargeItemSetListsCycleStep(miningSettings, 1,
+                new KLargeItemSetsCycleStep(miningSettings, index(DHPModel.INDEX_CURRENT_LARGE_ITEM_SET),
+                        new LargeItemSetItemsCycleStep(miningSettings, index(DHPModel.INDEX_CURRENT_ITEM_LARGE_ITEM_SET),
+                                new GenerateAssosiationRuleStep(miningSettings)))));
+        generateRules.addListenerExecute(new BlockExecuteTimingListner());
+
+        MiningSequence blocks = new MiningSequence(miningSettings,
+                buildBlock,
+                createLarge1ItemSetBlock,
+                createFirstHashTable,
+                createHashTables,
+                generateRules);
 
         blocks.addListenerExecute(new BlockExecuteTimingListner());
 

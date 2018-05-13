@@ -24,6 +24,7 @@ public class SetTransactionCountStep extends MiningBlock {
     protected EMiningModel execute(EMiningModel model) throws MiningException {
         DHPModel modelA = (DHPModel) model;
         modelA.setTransactionCount(modelA.getElement(index(AssociationRulesMiningModel.TRANSACTION_LIST_SET)).size());
+        System.out.println("Transactions count: "  + modelA.getElement(index(AssociationRulesMiningModel.TRANSACTION_LIST_SET)).size());
         return modelA;
     }
 }

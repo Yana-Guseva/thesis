@@ -1,11 +1,7 @@
 package org.eltech.ddm.associationrules.dhp.steps;
 
-import org.eltech.ddm.associationrules.HashMapMiningModelElement;
-import org.eltech.ddm.associationrules.HashTable;
-import org.eltech.ddm.associationrules.ItemSet;
-import org.eltech.ddm.associationrules.Transaction;
+import org.eltech.ddm.associationrules.*;
 import org.eltech.ddm.associationrules.dhp.DHPModel;
-import org.eltech.ddm.inputdata.MiningInputStream;
 import org.eltech.ddm.miningcore.MiningException;
 import org.eltech.ddm.miningcore.algorithms.MiningBlock;
 import org.eltech.ddm.miningcore.miningfunctionsettings.EMiningFunctionSettings;
@@ -13,9 +9,7 @@ import org.eltech.ddm.miningcore.miningmodel.EMiningModel;
 import org.eltech.ddm.miningcore.miningmodel.MiningModelElement;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static org.eltech.ddm.miningcore.miningmodel.EMiningModel.index;
 
@@ -34,20 +28,16 @@ public class CreateHashTable extends MiningBlock {
         DHPModel modelA = (DHPModel) model;
         Transaction transaction = modelA.getTransaction(modelA.getCurrentTransactionIndex());
         int curLargeItemsetIdx = modelA.getCurrentHashTableIndex() + 2;
-        HashMapMiningModelElement hashTable = modelA.getHashTable(curLargeItemsetIdx);
-        HashMapMiningModelElement largeItemSets = modelA.getHashTable(curLargeItemsetIdx - 1);
-        if (hashTable == null) {
-            hashTable = new HashTable(String.valueOf(curLargeItemsetIdx));
-            model.addElement(index(DHPModel.HASH_TABLE_SET), hashTable);
-        }
-        getTransactionSubsets(hashTable, largeItemSets, transaction, curLargeItemsetIdx + 1);
+        HashMapMiningModelElement largeItemSets =
+                (HashMapMiningModelElement) modelA.getElement(index(DHPModel.HASH_TABLE_SET, curLargeItemsetIdx - 1));
+        HashTableList hashTableList = (HashTableList) modelA.getElement(index(DHPModel.HASH_TABLE_SET));
+        HashTable hashTable = (HashTable) hashTableList.createOrGetElement(curLargeItemsetIdx);
+        List<String> transactionItemIDList = getTransactionItemIdList(transaction, largeItemSets);
+        getTransactionSubsets(hashTable, transactionItemIDList, curLargeItemsetIdx + 1);
         return modelA;
     }
 
-    public void getTransactionSubsets(HashMapMiningModelElement hashTable,
-                                      HashMapMiningModelElement largeItemSets, Transaction transaction, int k) {
-        List<String> transactionItemIDList = transaction.getItemIDList();
-        transactionItemIDList.retainAll(largeItemSets.getAllKeyElements());
+    private void getTransactionSubsets(HashTable hashTable, List<String> transactionItemIDList, int k) {
         if (transactionItemIDList.size() < k) {
             return;
         }
@@ -71,13 +61,7 @@ public class CreateHashTable extends MiningBlock {
                         sb.append(e);
                         sb.append(";");
                     });
-            String key = sb.toString();
-            ItemSet itemSet = (ItemSet) hashTable.getElement(key);
-            if (itemSet == null) {
-                itemSet = new ItemSet(key, elements);
-                hashTable.put(key, itemSet);
-            }
-            itemSet.setSupportCount(itemSet.getSupportCount() + 1);
+            addItemSet(hashTable, sb.toString(), elements);
             int n = 1;
             while (flag) {
                 indexes[indexes.length - n]++;
@@ -95,5 +79,16 @@ public class CreateHashTable extends MiningBlock {
                 }
             }
         }
+    }
+
+    private void addItemSet(HashTable hashTable, String key, List<String> elements) {
+        ItemSet itemSet = (ItemSet) hashTable.createOrGetElement(key, elements);
+        itemSet.incSupportCount();
+    }
+
+    private List<String> getTransactionItemIdList(Transaction transaction, HashMapMiningModelElement largeItemSets) {
+        List<String> transactionItemIDList = transaction.getItemIDList();
+        transactionItemIDList.retainAll(largeItemSets.getAllKeyElements());
+        return transactionItemIDList;
     }
 }

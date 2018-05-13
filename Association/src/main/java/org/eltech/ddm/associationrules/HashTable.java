@@ -61,4 +61,22 @@ public class HashTable extends HashMapMiningModelElement {
         o.setAllKeyElements(clonedAllKeyElements);
         return o;
     }
+
+    public synchronized MiningModelElement createOrGetElement(String key, List<String> elements) {
+        ItemSet itemSet = (ItemSet) getElement(key);
+        if (itemSet == null) {
+            itemSet = new ItemSet(key, elements);
+            put(key, itemSet);
+        }
+        return itemSet;
+    }
+
+    public synchronized MiningModelElement createOrGetElement(Item item) {
+        ItemSet itemSet = (ItemSet) getElement(item.getID());
+        if (itemSet == null) {
+            itemSet = new ItemSet(item);
+            put(item.getID(), itemSet);
+        }
+        return itemSet;
+    }
 }

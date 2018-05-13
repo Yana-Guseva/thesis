@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 
 public class Transaction extends MiningModelElement {
     protected String tid;
-    protected List<String> itemIDList = new ArrayList<String>();
+    protected List<String> itemIDList = new ArrayList<>();
 
     public Transaction(String tid) {
         super(tid);
